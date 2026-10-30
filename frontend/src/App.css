@@ -1,184 +1,538 @@
-.counter {
-  font-size: 16px;
-  padding: 5px 10px;
-  border-radius: 5px;
-  color: var(--accent);
-  background: var(--accent-bg);
-  border: 2px solid transparent;
-  transition: border-color 0.3s;
-  margin-bottom: 24px;
-
-  &:hover {
-    border-color: var(--accent-border);
-  }
-  &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
-}
-
-.hero {
-  position: relative;
-
-  .base,
-  .framework,
-  .vite {
-    inset-inline: 0;
-    margin: 0 auto;
-  }
-
-  .base {
-    width: 170px;
-    position: relative;
-    z-index: 0;
-  }
-
-  .framework,
-  .vite {
-    position: absolute;
-  }
-
-  .framework {
-    z-index: 1;
-    top: 34px;
-    height: 28px;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
-      scale(1.4);
-  }
-
-  .vite {
-    z-index: 0;
-    top: 107px;
-    height: 26px;
-    width: auto;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
-      scale(0.8);
-  }
-}
-
-#center {
+.structura-aplicatie {
   display: flex;
   flex-direction: column;
-  gap: 25px;
-  place-content: center;
+  min-height: 100svh;
+  background-color: var(--fundal-aplicatie);
+}
+
+.sari-la-continut {
+  position: absolute;
+  top: -100px;
+  left: 16px;
+  z-index: 100;
+  padding: 10px 16px;
+  border-radius: var(--raza-mica);
+  background-color: var(--accent);
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: top 0.15s ease;
+}
+
+.sari-la-continut:focus-visible {
+  top: 12px;
+}
+
+/* Antet */
+
+.antet {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 64px;
+  padding: 0 28px;
+  background-color: var(--fundal-suprafata);
+  border-bottom: 1px solid var(--chenar);
+}
+
+.antet__marca {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.antet__logo {
+  display: grid;
   place-items: center;
-  flex-grow: 1;
-
-  @media (max-width: 1024px) {
-    padding: 32px 20px 24px;
-    gap: 18px;
-  }
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background-color: var(--accent);
+  color: #ffffff;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
 }
 
-#next-steps {
+.antet__identitate {
   display: flex;
-  border-top: 1px solid var(--border);
-  text-align: left;
-
-  & > div {
-    flex: 1 1 0;
-    padding: 32px;
-    @media (max-width: 1024px) {
-      padding: 24px 20px;
-    }
-  }
-
-  .icon {
-    margin-bottom: 16px;
-    width: 22px;
-    height: 22px;
-  }
-
-  @media (max-width: 1024px) {
-    flex-direction: column;
-    text-align: center;
-  }
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.2;
 }
 
-#docs {
-  border-right: 1px solid var(--border);
-
-  @media (max-width: 1024px) {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
+.antet__titlu {
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-principal);
 }
 
-#next-steps ul {
-  list-style: none;
-  padding: 0;
+.antet__subtitlu {
+  overflow: hidden;
+  font-size: 0.75rem;
+  color: var(--text-secundar);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.antet__actiuni {
   display: flex;
+  align-items: center;
+  flex: none;
+}
+
+.indicator-demonstrativ {
+  display: inline-flex;
+  align-items: center;
   gap: 8px;
-  margin: 32px 0 0;
+  padding: 7px 12px;
+  border: 1px solid #c7d7f7;
+  border-radius: 999px;
+  background-color: var(--accent-soft);
+  color: var(--accent-puternic);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
 
-  .logo {
-    height: 18px;
+.indicator-demonstrativ__punct {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
+}
+
+/* Structura principală */
+
+.corp-aplicatie {
+  display: grid;
+  flex: 1;
+  grid-template-columns: 252px minmax(0, 1fr);
+  min-height: 0;
+}
+
+/* Meniu lateral */
+
+.meniu-lateral {
+  position: sticky;
+  top: 64px;
+  align-self: start;
+  height: calc(100svh - 64px);
+  padding: 24px 16px;
+  overflow-y: auto;
+  background-color: var(--fundal-lateral);
+  border-right: 1px solid var(--chenar);
+}
+
+.meniu-lateral__titlu {
+  margin: 0 0 12px;
+  padding: 0 12px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-discret);
+}
+
+.meniu-lateral__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.meniu-lateral__buton {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background-color: transparent;
+  color: var(--text-secundar);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.meniu-lateral__buton:hover {
+  background-color: #eef2f7;
+  color: var(--text-principal);
+}
+
+.meniu-lateral__buton--activ {
+  border-color: #d3e0fb;
+  background-color: var(--accent-soft);
+  color: var(--accent-puternic);
+}
+
+.meniu-lateral__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  margin-top: 1px;
+  color: var(--text-discret);
+}
+
+.meniu-lateral__buton--activ .meniu-lateral__icon {
+  color: var(--accent);
+}
+
+.meniu-lateral__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.meniu-lateral__eticheta {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.meniu-lateral__descriere {
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--text-discret);
+}
+
+.meniu-lateral__buton--activ .meniu-lateral__descriere {
+  color: #3b5bab;
+}
+
+/* Zona de conținut */
+
+.continut-principal {
+  min-width: 0;
+  padding: 32px;
+  background-color: var(--fundal-aplicatie);
+}
+
+.continut-principal:focus-visible {
+  outline: 3px solid rgba(29, 78, 216, 0.55);
+  outline-offset: -3px;
+}
+
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.pagina__antet {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pagina__eticheta {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.pagina__titlu {
+  margin: 0;
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--text-principal);
+}
+
+.pagina__subtitlu {
+  max-width: 68ch;
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text-secundar);
+}
+
+/* Spațiu rezervat pentru modelul 3D */
+
+.spatiu-3d {
+  display: flex;
+  flex-direction: column;
+  min-height: clamp(320px, 58vh, 620px);
+  overflow: hidden;
+  background-color: var(--fundal-suprafata);
+  border: 1px solid var(--chenar);
+  border-radius: var(--raza-mare);
+  box-shadow: var(--umbra-suprafata);
+}
+
+.spatiu-3d__bara {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 20px;
+  background-color: #fcfdff;
+  border-bottom: 1px solid var(--chenar);
+}
+
+.spatiu-3d__eticheta {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secundar);
+}
+
+.spatiu-3d__stare {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background-color: #f1f5f9;
+  color: var(--text-secundar);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.spatiu-3d__stare::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--chenar-puternic);
+}
+
+.spatiu-3d__continut {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px 24px;
+  background-image: radial-gradient(
+    circle,
+    rgba(148, 163, 184, 0.18) 1px,
+    transparent 1px
+  );
+  background-size: 22px 22px;
+  text-align: center;
+}
+
+.spatiu-3d__icon {
+  width: 64px;
+  height: 64px;
+  color: #b6c4da;
+}
+
+.spatiu-3d__titlu {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-principal);
+}
+
+.spatiu-3d__text {
+  max-width: 48ch;
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--text-secundar);
+}
+
+/* Pagini temporare */
+
+.pagina-temporara {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 720px;
+  padding: 32px;
+  background-color: var(--fundal-suprafata);
+  border: 1px solid var(--chenar);
+  border-radius: var(--raza-mare);
+  box-shadow: var(--umbra-suprafata);
+}
+
+.pagina-temporara__eticheta {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background-color: #f1f5f9;
+  color: var(--text-secundar);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.pagina-temporara__mesaj {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text-secundar);
+}
+
+/* Responsive */
+
+@media (max-width: 860px) {
+  .antet {
+    padding: 0 18px;
   }
 
-  a {
-    color: var(--text-h);
-    font-size: 16px;
-    border-radius: 6px;
-    background: var(--social-bg);
-    display: flex;
-    padding: 6px 12px;
+  .corp-aplicatie {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .meniu-lateral {
+    position: static;
+    height: auto;
+    padding: 10px 12px;
+    overflow: visible;
+    border-right: none;
+    border-bottom: 1px solid var(--chenar);
+  }
+
+  .meniu-lateral__titlu {
+    display: none;
+  }
+
+  .meniu-lateral__lista {
+    flex-direction: row;
+    gap: 6px;
+    padding: 4px 4px 6px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .meniu-lateral__element {
+    flex: 0 0 auto;
+  }
+
+  .meniu-lateral__buton {
     align-items: center;
     gap: 8px;
-    text-decoration: none;
-    transition: box-shadow 0.3s;
-
-    &:hover {
-      box-shadow: var(--shadow);
-    }
-    .button-icon {
-      height: 18px;
-      width: 18px;
-    }
+    width: auto;
+    padding: 8px 12px;
+    white-space: nowrap;
   }
 
-  @media (max-width: 1024px) {
-    margin-top: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
+  .meniu-lateral__icon {
+    width: 20px;
+    height: 20px;
+    margin-top: 0;
+  }
 
-    li {
-      flex: 1 1 calc(50% - 8px);
-    }
+  .meniu-lateral__descriere {
+    display: none;
+  }
 
-    a {
-      width: 100%;
-      justify-content: center;
-      box-sizing: border-box;
-    }
+  .continut-principal {
+    padding: 24px 20px;
   }
 }
 
-#spacer {
-  height: 88px;
-  border-top: 1px solid var(--border);
-  @media (max-width: 1024px) {
-    height: 48px;
+@media (max-width: 640px) {
+  .antet {
+    min-height: 60px;
+    padding: 0 16px;
+  }
+
+  .antet__logo {
+    width: 34px;
+    height: 34px;
+  }
+
+  .antet__subtitlu {
+    display: none;
+  }
+
+  .indicator-demonstrativ {
+    gap: 6px;
+    padding: 6px 10px;
+    font-size: 0.75rem;
+  }
+
+  .continut-principal {
+    padding: 20px 16px;
+  }
+
+  .pagina {
+    gap: 18px;
+  }
+
+  .pagina__titlu {
+    font-size: 1.375rem;
+  }
+
+  .pagina__subtitlu {
+    font-size: 0.9375rem;
+  }
+
+  .spatiu-3d {
+    min-height: 300px;
+    border-radius: var(--raza);
+  }
+
+  .spatiu-3d__continut {
+    padding: 32px 18px;
+  }
+
+  .pagina-temporara {
+    padding: 24px 18px;
+    border-radius: var(--raza);
   }
 }
 
-.ticks {
-  position: relative;
-  width: 100%;
-
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    top: -4.5px;
-    border: 5px solid transparent;
+@media (max-width: 375px) {
+  .antet {
+    gap: 8px;
+    padding: 0 12px;
   }
 
-  &::before {
-    left: 0;
-    border-left-color: var(--border);
+  .antet__marca {
+    gap: 8px;
   }
-  &::after {
-    right: 0;
-    border-right-color: var(--border);
+
+  .antet__titlu {
+    font-size: 1rem;
+  }
+
+  .indicator-demonstrativ {
+    gap: 5px;
+    padding: 5px 8px;
+    font-size: 0.6875rem;
+  }
+
+  .meniu-lateral {
+    padding: 8px 10px;
+  }
+
+  .meniu-lateral__buton {
+    padding: 8px 10px;
+  }
+
+  .continut-principal {
+    padding: 16px 12px;
+  }
+
+  .pagina-temporara {
+    padding: 20px 14px;
   }
 }

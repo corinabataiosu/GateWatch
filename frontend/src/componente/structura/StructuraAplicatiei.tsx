@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { PanouStareCamera } from '../camere/PanouStareCamera'
 import { Antet } from './Antet'
 import { MeniuLateral, type IdPagina } from './MeniuLateral'
 
@@ -82,6 +83,8 @@ function PanouPrincipal() {
           </p>
         </div>
       </div>
+
+      <PanouStareCamera />
     </section>
   )
 }

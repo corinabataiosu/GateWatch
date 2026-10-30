@@ -536,3 +536,487 @@
     padding: 20px 14px;
   }
 }
+
+/* Panou stare cameră */
+
+.panou-stare-camera {
+  --stare-buna: #1d4ed8;
+  --stare-atentie: #b45309;
+  --stare-alerta: #b42318;
+  --stare-neutra: #64748b;
+
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  background-color: var(--fundal-suprafata);
+  border: 1px solid var(--chenar);
+  border-radius: var(--raza-mare);
+  box-shadow: var(--umbra-suprafata);
+}
+
+.panou-stare-camera__antet {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.panou-stare-camera__identitate {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.panou-stare-camera__eticheta {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.panou-stare-camera__titlu {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--text-principal);
+}
+
+.panou-stare-camera__meta {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--text-secundar);
+}
+
+.panou-stare-camera__insigne {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.insigna-demonstrativa,
+.insigna-scenariu {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.insigna-demonstrativa {
+  background-color: var(--accent-soft);
+  border-color: #c7d7f7;
+  color: var(--accent-puternic);
+}
+
+.insigna-scenariu {
+  background-color: #f1f5f9;
+  border-color: var(--chenar);
+  color: var(--text-secundar);
+}
+
+.insigna-scenariu--buna {
+  background-color: var(--accent-soft);
+  border-color: #c7d7f7;
+  color: var(--accent-puternic);
+}
+
+.insigna-scenariu--atentie {
+  background-color: #fffbeb;
+  border-color: #fde68a;
+  color: #92400e;
+}
+
+.insigna-scenariu--alerta {
+  background-color: var(--alerta-soft);
+  border-color: #fecdca;
+  color: var(--alerta);
+}
+
+.panou-stare-camera__anunt {
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--chenar);
+  border-radius: 10px;
+  background-color: #f8fafc;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-secundar);
+}
+
+.panou-stare-camera__grila {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.indicator-camera {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--chenar);
+  border-radius: 12px;
+  background-color: #f8fafc;
+}
+
+.indicator-camera__eticheta {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-discret);
+}
+
+.indicator-camera__valoare {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.indicator-camera__valoare::before {
+  content: '';
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: currentColor;
+}
+
+.indicator-camera__valoare--buna {
+  color: var(--stare-buna);
+}
+
+.indicator-camera__valoare--atentie {
+  color: var(--stare-atentie);
+}
+
+.indicator-camera__valoare--alerta {
+  color: var(--stare-alerta);
+}
+
+.indicator-camera__valoare--neutra {
+  color: var(--stare-neutra);
+}
+
+.indicator-camera__detaliu {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--text-discret);
+}
+
+.panou-stare-camera__detaliu-analiza {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-secundar);
+}
+
+.panou-stare-camera__detaliu-analiza span {
+  font-weight: 600;
+  color: var(--text-principal);
+}
+
+.panou-stare-camera__sectiune {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.panou-stare-camera__titlu-sectiune {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text-principal);
+}
+
+.panou-stare-camera__numar-alerte {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background-color: #f1f5f9;
+  color: var(--text-secundar);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.metrici-camera {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.metrici-camera__element {
+  padding: 12px 14px;
+  border: 1px solid var(--chenar);
+  border-radius: 10px;
+  background-color: var(--fundal-suprafata);
+}
+
+.metrici-camera__eticheta {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-discret);
+}
+
+.metrici-camera__valoare {
+  margin: 4px 0 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-principal);
+  font-variant-numeric: tabular-nums;
+}
+
+.metrici-camera__valoare--indisponibil {
+  font-weight: 600;
+  color: var(--text-discret);
+}
+
+.panou-stare-camera__controale {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.panou-stare-camera__legenda {
+  padding: 0;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-discret);
+}
+
+.panou-stare-camera__butoane {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.buton-scenariu {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 9px 16px;
+  border: 1px solid var(--chenar-puternic);
+  border-radius: 9px;
+  background-color: var(--fundal-suprafata);
+  color: var(--text-secundar);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.3;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.buton-scenariu:hover {
+  border-color: #94a3b8;
+  background-color: #f1f5f9;
+  color: var(--text-principal);
+}
+
+.buton-scenariu--activ {
+  border-color: #c7d7f7;
+  background-color: var(--accent-soft);
+  color: var(--accent-puternic);
+}
+
+.buton-scenariu--activ:hover {
+  border-color: #c7d7f7;
+  background-color: var(--accent-soft);
+  color: var(--accent-puternic);
+}
+
+.alerte-camera {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.alerta-camera {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  border: 1px solid var(--chenar);
+  border-left: 4px solid var(--stare-neutra);
+  border-radius: 10px;
+  background-color: var(--fundal-suprafata);
+}
+
+.alerta-camera--alerta {
+  border-left-color: var(--stare-alerta);
+  background-color: #fffbfa;
+}
+
+.alerta-camera--atentie {
+  border-left-color: var(--stare-atentie);
+  background-color: #fffdf7;
+}
+
+.alerta-camera--neutra {
+  border-left-color: var(--stare-neutra);
+  background-color: #f8fafc;
+}
+
+.alerta-camera__antet {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.alerta-camera__severitate {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.alerta-camera__severitate--alerta {
+  background-color: var(--alerta-soft);
+  color: var(--alerta);
+}
+
+.alerta-camera__severitate--atentie {
+  background-color: #fffbeb;
+  color: #92400e;
+}
+
+.alerta-camera__severitate--neutra {
+  background-color: #f1f5f9;
+  color: var(--text-secundar);
+}
+
+.alerta-camera__tip {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secundar);
+}
+
+.alerta-camera__ora {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--text-discret);
+  font-variant-numeric: tabular-nums;
+}
+
+.alerta-camera__mesaj {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-principal);
+  overflow-wrap: anywhere;
+}
+
+.alerta-camera__meta {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--text-discret);
+}
+
+.panou-stare-camera__fara-alerte {
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px dashed var(--chenar-puternic);
+  border-radius: 10px;
+  background-color: #f8fafc;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-secundar);
+}
+
+.panou-stare-camera__nota {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--text-discret);
+}
+
+@media (max-width: 860px) {
+  .panou-stare-camera {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .panou-stare-camera {
+    gap: 16px;
+    padding: 18px;
+    border-radius: var(--raza);
+  }
+
+  .panou-stare-camera__antet {
+    flex-direction: column;
+  }
+
+  .panou-stare-camera__grila {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .panou-stare-camera__butoane {
+    flex-direction: column;
+  }
+
+  .buton-scenariu {
+    width: 100%;
+  }
+
+  .alerta-camera__ora {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .panou-stare-camera {
+    padding: 16px;
+  }
+
+  .panou-stare-camera__grila {
+    grid-template-columns: 1fr;
+  }
+
+  .metrici-camera {
+    grid-template-columns: 1fr;
+  }
+}

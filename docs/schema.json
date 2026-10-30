@@ -1,0 +1,11 @@
+{
+  "packet_id": "string",
+  "timestamp": "float",
+  "src_ip": "string",
+  "dst_ip": "string",
+  "src_port": "integer",
+  "dst_port": "integer",
+  "protocol": "string",
+  "tcp_flags": "string",
+  "packet_length": "integer"
+}

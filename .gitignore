@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+.env
+
+# Node
+node_modules/
+dist/
+
+# ML / Data
+*.pkl
+*.csv
+*.log
+*.sqlite3
+
+# Ide & OS
+.vscode/
+.DS_Store

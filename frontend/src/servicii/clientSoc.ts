@@ -137,11 +137,6 @@ export function genereazaRaport(): Promise<RaportSoc> {
   return cerere<RaportSoc>('/api/report')
 }
 
-/** Adresa versiunii HTML a raportului, descărcabilă și tipăribilă. */
-export function adresaRaportHtml(): string {
-  return `${ADRESA_BAZA}/api/report?format=html`
-}
-
 export function reseteazaSoc(): Promise<unknown> {
   return cerere('/api/reset', { method: 'POST' })
 }

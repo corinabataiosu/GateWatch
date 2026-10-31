@@ -130,6 +130,7 @@ function ContinutRaport({ raport }: { raport: RaportSoc }) {
                     {alerta.technique_id && (
                       <span className="raport__tehnica"> · {alerta.technique_id}</span>
                     )}
+                    <span className="raport__detaliu">{alerta.description}</span>
                   </li>
                 ))}
               </ul>
@@ -146,31 +147,6 @@ function ContinutRaport({ raport }: { raport: RaportSoc }) {
         </ul>
       )}
 
-      {raport.alerts_by_rule.length > 0 && (
-        <>
-          <h3 className="raport__titlu">Alerte după regulă</h3>
-          <div className="tabel-container">
-            <table className="tabel tabel--compact">
-              <thead>
-                <tr>
-                  <th scope="col">Regulă</th>
-                  <th scope="col">Descriere</th>
-                  <th scope="col">Alerte</th>
-                </tr>
-              </thead>
-              <tbody>
-                {raport.alerts_by_rule.map((regula) => (
-                  <tr key={regula.rule_id}>
-                    <td className="tabel__monospatiat">{regula.rule_id}</td>
-                    <td>{regula.name}</td>
-                    <td className="tabel__numar">{regula.count}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </>
-      )}
     </div>
   )
 }

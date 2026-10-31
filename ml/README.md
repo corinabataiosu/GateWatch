@@ -7,6 +7,7 @@ sursa_video.py          cadre: camera reală (OpenCV) sau scenă sintetică
 caracteristici_video.py ML-02.1  luminozitate, claritate, diferență între cadre
 model_video.py          ML-02.2  Isolation Forest + domeniul învățat; antrenare și artefact salvat
 agent_video.py          cadre → caracteristici → scor → POST /api/video/telemetry (SOC), 1 eșantion/s
+flux_video.py           fluxul MJPEG al cadrelor analizate: http://127.0.0.1:8002/flux.mjpg (pagina Camere)
 testare_camera.py       ML-01    test de captură de la camera laptopului
 ```
 

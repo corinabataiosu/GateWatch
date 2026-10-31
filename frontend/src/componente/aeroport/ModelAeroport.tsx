@@ -9,20 +9,15 @@ import {
   Vector3,
   type PerspectiveCamera,
 } from 'three'
-import { MarkerCamera } from './MarkerCamera'
-import type {
-  CameraDemonstrativa,
-  IdentificatorCamera,
-} from '../../tipuri/camera'
+import { DISPOZITIVE_AEROPORT } from './dispozitiveAeroport'
+import { MarkerDispozitiv, type StareVizuala } from './MarkerDispozitiv'
 
 type ProprietatiModelAeroport = {
-  identificatorSelectat?: IdentificatorCamera | null
-  stareCamera?: CameraDemonstrativa | null
-  onSelecteazaCamera?: (identificator: IdentificatorCamera) => void
+  identificatorSelectat?: string | null
+  /** Starea afișată pentru fiecare dispozitiv; lipsa unei intrări înseamnă „normal”. */
+  stari?: Record<string, StareVizuala>
+  onSelecteazaDispozitiv?: (identificator: string) => void
 }
-
-const IDENTIFICATOR_MARKER: IdentificatorCamera = 'CAM-01'
-const POZITIE_MARKER: [number, number, number] = [4.4, 0, -5.6]
 
 type Pozitie3D = [number, number, number]
 
@@ -677,8 +672,8 @@ function Cadrare() {
 
 export function ModelAeroport({
   identificatorSelectat = null,
-  stareCamera = null,
-  onSelecteazaCamera,
+  stari = {},
+  onSelecteazaDispozitiv,
 }: ProprietatiModelAeroport) {
   return (
     <>
@@ -720,13 +715,17 @@ export function ModelAeroport({
         <Aeronava pozitie={[-8, 0.1, -1.5]} />
         <Aeronava pozitie={[8, 0.1, -1.5]} />
 
-        <MarkerCamera
-          pozitie={POZITIE_MARKER}
-          identificator={IDENTIFICATOR_MARKER}
-          selectat={identificatorSelectat === IDENTIFICATOR_MARKER}
-          stare={stareCamera}
-          onSelecteaza={onSelecteazaCamera}
-        />
+        {DISPOZITIVE_AEROPORT.map((dispozitiv) => (
+          <MarkerDispozitiv
+            key={dispozitiv.id}
+            identificator={dispozitiv.id}
+            tip={dispozitiv.tip}
+            pozitie={dispozitiv.pozitie}
+            stare={stari[dispozitiv.id] ?? 'normal'}
+            selectat={identificatorSelectat === dispozitiv.id}
+            onSelecteaza={onSelecteazaDispozitiv}
+          />
+        ))}
       </group>
 
       <Cadrare />

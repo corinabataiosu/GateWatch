@@ -123,11 +123,6 @@ def render_html(report: dict[str, Any]) -> str:
   <h4>Acțiuni de răspuns</h4><ul>{actions}</ul>
 </section>""")
 
-    by_rule = "".join(f"<tr>{rows([escape(r['rule_id']), escape(r['name']), r['count']])}</tr>"
-                      for r in report["alerts_by_rule"]) or '<tr><td colspan="3">—</td></tr>'
-    techniques = "".join(
-        f"<tr>{rows([escape(x['technique_id']), escape(x.get('technique', '')), escape(x.get('tactic', '')), x['count']])}</tr>"
-        for x in report["techniques"]) or '<tr><td colspan="4">—</td></tr>'
     devices = "".join(
         f"<tr>{rows([escape(d['device_id']), escape(d['name'] or ''), escape(d['zone'] or ''), escape(SECURITY_LABELS[d['security_state']]), escape(d['operational_status']), d['open_alerts']])}</tr>"
         for d in report["devices_at_risk"]) or '<tr><td colspan="6">Niciun dispozitiv la risc.</td></tr>'
@@ -163,10 +158,6 @@ th {{ background: #f4f7fa; }}
 <p class="meta">Alerte după severitate — {escape(severity)} · surse: {t['alerts_rule']} reguli, {t['alerts_ml']} ML</p>
 <h2>Incidente</h2>
 {''.join(incidents_html) or '<p>Niciun incident.</p>'}
-<h2>Alerte după regulă</h2>
-<table><thead><tr><th>Regulă</th><th>Descriere</th><th>Alerte</th></tr></thead><tbody>{by_rule}</tbody></table>
-<h2>Tehnici MITRE ATT&amp;CK observate</h2>
-<table><thead><tr><th>ID</th><th>Tehnică</th><th>Tactică</th><th>Alerte</th></tr></thead><tbody>{techniques}</tbody></table>
 <h2>Dispozitive la risc</h2>
 <table><thead><tr><th>Dispozitiv</th><th>Nume</th><th>Zonă</th><th>Stare securitate</th><th>Stare operațională</th><th>Alerte deschise</th></tr></thead><tbody>{devices}</tbody></table>
 <p class="meta">Raport generat automat de SOC-ul GateWatch din datele simulatorului de infrastructură și ale modulului video.</p>

@@ -144,3 +144,25 @@ def test_ml_alerts_attach_to_incident_by_entity(client, sim, factory):
     assert all(a["score"] >= client.app_state.pipeline.detector.threshold for a in ml)
     assert any(d["ml"] for d in client.get("/api/devices").json() if d["device_id"] == "CAM-01")
     assert ATTACKER in client.get("/api/incidents").json()[0]["entities"]["ips"]
+
+
+def test_http_brute_force_on_cam01_opens_incident_with_only_evidence(client, sim, factory):
+    """The primary demo path: observed_http logins against CAM-01, interleaved with routine traffic."""
+    events = []
+    for _ in range(6):
+        events.append(factory.make("CAM-01", "auth_login", "failure", ip="127.0.0.1", user="admin",
+                                   origin="observed_http", advance=2))
+        events.append(factory.make("CAM-01", "stream_status", ip="10.20.1.11", origin="synthetic", advance=0.5))
+    events.append(factory.make("CAM-01", "auth_login", ip="127.0.0.1", user="admin", origin="observed_http"))
+    events += [factory.make("CAM-01", "stream_status", ip="10.20.1.11", origin="synthetic", advance=5)
+               for _ in range(3)]
+    sim.events = events
+    ingest(client)
+
+    incidents = client.get("/api/incidents").json()
+    assert len(incidents) == 1 and incidents[0]["devices"] == ["CAM-01"]
+    detail = client.get(f"/api/incidents/{incidents[0]['incident_id']}").json()
+    assert {"GW-R01", "GW-R02"} <= {a["rule_id"] for a in detail["alerts"]}
+    assert {e["event_type"] for e in detail["timeline"]} == {"auth_login"}
+    cam = next(d for d in client.get("/api/devices").json() if d["device_id"] == "CAM-01")
+    assert cam["security_state"] == "compromised"

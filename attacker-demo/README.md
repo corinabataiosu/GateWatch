@@ -3,7 +3,7 @@
 `attack_cam01.py` runs a live attack against the simulator's **interactive services**. It needs only the Python standard library. Every request becomes an `observed_http` event with your machine's real IP, so the SOC detects it the same way it detects scenario traffic.
 
 ```bash
-python attacker-demo/attack_cam01.py --target http://localhost:8001
+python attacker-demo/attack_cam01.py --target http://127.0.0.1:8001
 ```
 
 Steps:

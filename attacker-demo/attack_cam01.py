@@ -35,7 +35,7 @@ def request(url: str, method: str = "GET", body: dict | None = None, token: str 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="GateWatch CAM-01 attack demo")
-    parser.add_argument("--target", default="http://localhost:8001", help="simulator base URL")
+    parser.add_argument("--target", default="http://127.0.0.1:8001", help="simulator base URL")
     parser.add_argument("--user", default="admin")
     parser.add_argument("--delay", type=float, default=0.3, help="seconds between attempts")
     args = parser.parse_args()

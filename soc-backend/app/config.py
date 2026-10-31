@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 @dataclass
 class Settings:
-    simulator_url: str = field(default_factory=lambda: os.getenv("GATEWATCH_SIM_URL", "http://localhost:8001"))
+    simulator_url: str = field(default_factory=lambda: os.getenv("GATEWATCH_SIM_URL", "http://127.0.0.1:8001"))
     admin_token: str = field(default_factory=lambda: os.getenv("GATEWATCH_ADMIN_TOKEN", "gatewatch-admin"))
     db_path: str = field(default_factory=lambda: os.getenv("GATEWATCH_SOC_DB", str(BASE_DIR / "data" / "soc.sqlite3")))
     model_path: str = field(default_factory=lambda: os.getenv("GATEWATCH_MODEL", str(BASE_DIR / "models" / "isolation_forest.joblib")))

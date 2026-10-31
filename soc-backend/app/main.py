@@ -7,7 +7,7 @@ import urllib.error
 from contextlib import asynccontextmanager
 from typing import Any, Literal, Optional
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, Header, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -20,6 +20,7 @@ from .ml.detector import AnomalyDetector
 from .models import now_iso
 from .pipeline import Pipeline
 from .rules import SEVERITY_RANK
+from .video import VideoMonitor, VideoTelemetry
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
 
@@ -60,6 +61,7 @@ def create_app(config: Settings = default_settings, client: Optional[SimulatorCl
     pipeline = Pipeline(db, detector)
     ingestion = IngestionEngine(config, db, pipeline, client)
     correlator = Correlator(db)
+    video = VideoMonitor()
 
     @asynccontextmanager
     async def lifespan(_: FastAPI):
@@ -102,6 +104,7 @@ def create_app(config: Settings = default_settings, client: Optional[SimulatorCl
                 "ip": device.get("ip"), "name": device.get("name"), "operational_status": operational,
                 "security_state": security, "open_alerts": len(mine), "last_seen": device.get("last_seen"),
                 "ml": score.__dict__ if score else None,
+                "video": video.view(device["device_id"]),
             })
         return rows
 
@@ -194,9 +197,29 @@ def create_app(config: Settings = default_settings, client: Optional[SimulatorCl
             raise HTTPException(502, detail)
         return {"result": result, "detail": detail, "incident": incident_view(db, get_incident(incident_id))}
 
+    @app.post("/api/video/telemetry")
+    def video_telemetry(body: VideoTelemetry, x_admin_token: Optional[str] = Header(default=None)):
+        if x_admin_token != config.admin_token:
+            raise HTTPException(401, "invalid or missing X-Admin-Token")
+        if body.device_id not in {d["device_id"] for d in ingestion.devices} and ingestion.devices:
+            raise HTTPException(404, f"unknown device {body.device_id}")
+        draft, cleared = video.ingest(body)
+        alert = None
+        if draft:
+            alert = correlator.record(draft, video.latest[body.device_id]["captured_at"],
+                                      ingestion.status["run_id"] or "video")
+        if cleared:
+            # The image is usable again: close the video alert unless an analyst owns it via an incident.
+            db.execute("UPDATE alerts SET status = 'closed', updated_at = ? WHERE rule_id = 'GW-V01' "
+                       "AND device_id = ? AND status = 'open' AND incident_id IS NULL",
+                       (now_iso(), body.device_id))
+        return {"accepted": True, "alert_id": alert["alert_id"] if alert else None,
+                "streak": video.anomaly_streak.get(body.device_id, 0)}
+
     @app.post("/api/reset")
     def reset():
         pipeline.reset()
+        video.reset()
         return {"status": "reset"}
 
     return app

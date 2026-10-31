@@ -25,9 +25,13 @@ _HOLDERS = [
     "Vlad Constantin", "Alina Toma", "George Barbu", "Laura Nistor", "Paul Moldovan",
     "Simona Iliescu", "Dan Preda", "Bianca Ene", "Florin Lazar", "Irina Voicu",
 ]
-# 20 staff badges; the first five also hold operations (restricted) clearance.
+# 20 staff badges; the first five also hold operations (restricted) clearance. Each holder works
+# in one area and badges at that area's reader, so a badge seen at two readers seconds apart is
+# genuinely suspicious (the SOC's impossible-travel rule relies on this).
+_HOME_READERS = ["ACS-01", "ACS-02"]
 STAFF_BADGES = [
-    {"badge_id": f"B-{10420 + i}", "holder": holder, "operations": i < 5}
+    {"badge_id": f"B-{10420 + i}", "holder": holder, "operations": i < 5,
+     "reader": "ACS-03" if i < 5 else _HOME_READERS[i % 2]}
     for i, holder in enumerate(_HOLDERS)
 ]
 
@@ -136,13 +140,13 @@ class BaselineEngine:
                                    "camera": f"CAM-0{self._rng.randint(1, 8)}"})
 
     def _badge_access(self, active) -> None:
-        readers = [d for d in active if d.type == "access_control"]
-        if not readers:
+        readers = {d.device_id: d for d in active if d.type == "access_control"}
+        pool = [b for b in STAFF_BADGES if b["reader"] in readers]
+        if not pool:
             return
-        device = self._rng.choice(readers)
-        door, restricted = self._rng.choice(DOORS[device.device_id])
-        pool = [b for b in STAFF_BADGES if b["operations"]] if restricted else STAFF_BADGES
         badge = self._rng.choice(pool)
+        device = readers[badge["reader"]]
+        door, restricted = self._rng.choice(DOORS[device.device_id])
         self.sim.emit(
             device, "badge_access", "success", "synthetic",
             source={"ip": device.ip, "user": badge["holder"], "zone": device.zone},

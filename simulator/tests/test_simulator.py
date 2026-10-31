@@ -182,3 +182,14 @@ def test_control_panel_is_served(client):
     response = client.get("/panel/")
     assert response.status_code == 200
     assert "Panou de control simulator" in response.text
+
+
+def test_baseline_badges_stay_at_their_home_reader(client, sim):
+    # Otherwise normal traffic looks like a cloned badge to the SOC's impossible-travel rule.
+    for second in range(3000):
+        sim.baseline.tick(now=float(second))
+    readers: dict[str, set[str]] = {}
+    for event in all_events(client):
+        if event["event_type"] == "badge_access":
+            readers.setdefault(event["details"]["badge_id"], set()).add(event["device_id"])
+    assert readers and all(len(devices) == 1 for devices in readers.values())

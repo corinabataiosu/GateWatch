@@ -98,3 +98,28 @@ Attacker internal IP after VPN: `10.20.0.250`.
 - `PATCH /api/incidents/{id}` body `{status}`
 - `POST /api/incidents/{id}/actions` body `{action: "isolate_device", device_id}` → calls simulator isolate
 - `POST /api/reset` → clear SOC state (alerts/incidents/events); ingestion follows simulator's current run
+
+## 6. Video telemetry (video module → SOC)
+
+The video module (`ml/src/agent_video.py`) is a second source for the same logical camera: the simulator
+reports what the camera *does*, the video module what it *sees*. It posts one sample per second:
+
+`POST /api/video/telemetry` (header `X-Admin-Token`)
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `device_id` | string | e.g. `CAM-01` |
+| `captured_at` | string | ISO-8601 UTC |
+| `brightness` | float 0–255 | mean grayscale (ML-02.1 `luminozitate_medie`) |
+| `sharpness` | float ≥ 0 | Laplacian variance (ML-02.1 `claritate`) |
+| `frame_diff` | float 0–255 \| null | mean abs. difference to previous frame |
+| `score`, `threshold` | float | video Isolation Forest (ML-02.2) |
+| `is_anomaly` | bool | score ≥ threshold or a feature outside the learned normal range |
+| `out_of_range` | string[] | features outside the learned range |
+| `model_version` | string | artifact version |
+| `source` | `camera` \| `synthetic` | |
+
+SOC behaviour: 3 consecutive anomalous samples → alert `GW-V01` (source `ml`, severity `medium`, device state
+`warning`). It never opens an incident on its own; it joins an active incident that already involves the
+device. Five consecutive normal samples close an unlinked `GW-V01` alert. `/api/devices[].video` exposes the
+latest sample plus `stale` (no sample for 10 s) and `diagnosis`.

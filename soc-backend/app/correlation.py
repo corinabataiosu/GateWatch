@@ -18,6 +18,7 @@ DEDUP_WINDOW = timedelta(minutes=10)
 CORRELATION_WINDOW = timedelta(minutes=30)
 TEMPORAL_WINDOW = timedelta(minutes=10)
 ACTIVE_STATUSES = ("new", "investigating", "contained")
+ML_STEP_LABELS = {"GW-ML01": "Anomalie comportamentală (ML)", "GW-V01": "Anomalie video (ML)"}
 
 
 def parse(ts: str) -> datetime:
@@ -123,7 +124,8 @@ class Correlator:
         severity = max((a["severity"] for a in alerts), key=SEVERITY_RANK.get)
         devices = list(dict.fromkeys(a["device_id"] for a in alerts))
         tactics = [t for t in TACTIC_ORDER if any(a["tactic"] == t for a in alerts)]
-        steps = list(dict.fromkeys(a["technique"] or "Anomalie comportamentală (ML)" for a in alerts))
+        steps = list(dict.fromkeys(a["technique"] or ML_STEP_LABELS.get(a["rule_id"], "Anomalie comportamentală (ML)")
+                                   for a in alerts))
         if len(tactics) >= 3:
             title = f"Intruziune în mai multe etape ({tactics[0]} → {tactics[-1]})"
         else:

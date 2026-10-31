@@ -17,7 +17,6 @@ import argparse
 import sys
 import time
 
-import cv2
 
 NUME_FEREASTRA = "GateWatch - testare camera"
 TASTE_IESIRE = {"q", "Q"}

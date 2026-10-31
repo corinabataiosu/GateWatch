@@ -81,7 +81,10 @@ class AnomalyDetector:
         return result
 
     def draft(self, event: Event, score: Score) -> Optional[AlertDraft]:
-        if not score.is_anomaly:
+        # A routine status report inside an already anomalous window updates the score but is not
+        # evidence, so it must not be attached to the alert (and the incident timeline).
+        routine = event.event_type == "stream_status" and event.outcome != "failure"
+        if not score.is_anomaly or routine:
             return None
         severity = "high" if score.score >= self.threshold + 0.08 else "medium"
         drivers = ", ".join(score.top_features) or "combinație neobișnuită de evenimente"

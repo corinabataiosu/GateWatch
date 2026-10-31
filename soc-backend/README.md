@@ -14,7 +14,7 @@ python -m uvicorn app.main:app --port 8000      # needs the simulator on :8001
 
 | Variable | Default | Meaning |
 | --- | --- | --- |
-| `GATEWATCH_SIM_URL` | `http://localhost:8001` | Simulator base URL |
+| `GATEWATCH_SIM_URL` | `http://127.0.0.1:8001` | Simulator base URL |
 | `GATEWATCH_ADMIN_TOKEN` | `gatewatch-admin` | Token sent for response actions (isolate device) |
 | `GATEWATCH_SOC_DB` | `soc-backend/data/soc.sqlite3` | SQLite store |
 | `GATEWATCH_MODEL` | `soc-backend/models/isolation_forest.joblib` | ML artifact |
@@ -43,6 +43,10 @@ python -m uvicorn app.main:app --port 8000      # needs the simulator on :8001
 
 - **ML** (`GW-ML01`): Isolation Forest over 13 per-device features in a trailing 60 s window
   (`ml/features.py`). Alerts link to incidents by device only and never open an incident on their own.
+- **Video** (`GW-V01`, `video.py`): telemetry from the video module (`POST /api/video/telemetry`,
+  contract §6). 3 consecutive anomalous samples raise a medium alert (device `warning`, never `compromised`
+  on video evidence alone). It joins an incident only when the camera is already in one, and closes
+  automatically after 5 normal samples if no incident owns it.
 - **Correlation**: an alert joins an active incident sharing a device/IP/user/badge within 30 min; a
   high-severity rule alert with no shared entity joins a recent multi-alert incident (10 min) — this links
   the physical-access step. Repeated detections update one alert (10 min de-dup window).
@@ -60,8 +64,8 @@ python simulator/tools/export_baseline.py --hours 8 --out soc-backend/data/sim_b
 cd soc-backend && python -m app.ml.train --events data/sim_baseline.jsonl
 ```
 
-On a 3 h held-out simulator baseline the current model raised 2 false windows out of 4,561, while flagging
-CAM-01 (brute force + tampering) and NVR-01 (export + evidence deletion) in the attack scenario.
+On a 3 h held-out simulator baseline (19,927 events) the full pipeline — rules, ML and correlation —
+raised **0 alerts**, while the attack scenario is flagged by every rule and by the model on CAM-01 and NVR-01.
 
 ## Tests
 

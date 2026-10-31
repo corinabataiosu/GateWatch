@@ -17,3 +17,7 @@ dist/
 # Ide & OS
 .vscode/
 .DS_Store
+# Runtime data (SQLite stores, exported baselines)
+simulator/data/
+soc-backend/data/
+*.jsonl

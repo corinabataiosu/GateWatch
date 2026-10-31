@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GateWatch — Panou de control simulator</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="antet">
+    <div class="antet__marca">
+      <span class="antet__logo">GW</span>
+      <div>
+        <h1 class="antet__titlu">Panou de control simulator</h1>
+        <p class="antet__subtitlu">Infrastructură aeroportuară virtuală · 15 dispozitive · 4 zone</p>
+      </div>
+    </div>
+    <div class="antet__stare">
+      <span id="indicator-conexiune" class="insigna insigna--neutra">Se conectează…</span>
+    </div>
+  </header>
+
+  <main class="grila">
+    <section class="card card--rulare" aria-labelledby="t-rulare">
+      <h2 id="t-rulare" class="card__titlu">Rulare curentă</h2>
+      <dl class="campuri">
+        <div><dt>ID rulare</dt><dd id="run-id">—</dd></div>
+        <div><dt>Evenimente</dt><dd id="run-seq">0</dd></div>
+        <div><dt>Mod scenariu</dt><dd id="run-mode">—</dd></div>
+        <div><dt>Stare scenariu</dt><dd id="run-state">—</dd></div>
+      </dl>
+
+      <label class="camp-token">
+        <span>Token administrare</span>
+        <input id="token" type="password" autocomplete="off" placeholder="X-Admin-Token" />
+      </label>
+
+      <div class="actiuni">
+        <button id="btn-rulare-noua" class="buton">Rulare nouă</button>
+        <button id="btn-auto" class="buton buton--principal">Pornește AUTO</button>
+        <button id="btn-live" class="buton">Pornește LIVE</button>
+        <button id="btn-pas" class="buton">Pasul următor</button>
+        <button id="btn-stop" class="buton buton--pericol">Oprește</button>
+      </div>
+
+      <div class="baseline">
+        <label class="comutator">
+          <input id="baseline-activ" type="checkbox" checked />
+          <span>Trafic de bază (sintetic)</span>
+        </label>
+        <label class="rata">
+          <span>Rată</span>
+          <input id="baseline-rata" type="number" min="0.1" max="10" step="0.1" value="1" />
+        </label>
+        <button id="btn-baseline" class="buton buton--mic">Aplică</button>
+      </div>
+
+      <p id="mesaj" class="mesaj" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="card card--harta" aria-labelledby="t-harta">
+      <h2 id="t-harta" class="card__titlu">Hartă zone și dispozitive</h2>
+      <svg id="harta" viewBox="0 0 640 360" role="img" aria-label="Hartă schematică a zonelor aeroportului">
+        <g class="zona"><rect x="10" y="10" width="305" height="165" rx="10" /><text x="24" y="34">Terminal</text></g>
+        <g class="zona"><rect x="325" y="10" width="305" height="165" rx="10" /><text x="339" y="34">Platformă (airside)</text></g>
+        <g class="zona"><rect x="10" y="185" width="305" height="165" rx="10" /><text x="24" y="209">Perimetru</text></g>
+        <g class="zona"><rect x="325" y="185" width="305" height="165" rx="10" /><text x="339" y="209">Operațiuni</text></g>
+        <g id="harta-dispozitive"></g>
+      </svg>
+      <ul class="legenda">
+        <li><span class="punct punct--online"></span>Online</li>
+        <li><span class="punct punct--isolated"></span>Izolat</li>
+        <li><span class="punct punct--offline"></span>Offline</li>
+        <li><span class="punct punct--activ"></span>Activitate recentă de atac</li>
+      </ul>
+    </section>
+
+    <section class="card card--scenariu" aria-labelledby="t-scenariu">
+      <h2 id="t-scenariu" class="card__titlu">Scenariu: <span id="scenariu-nume">Compromised Vendor</span></h2>
+      <ol id="etape" class="etape"></ol>
+    </section>
+
+    <section class="card card--flux" aria-labelledby="t-flux">
+      <div class="card__antet">
+        <h2 id="t-flux" class="card__titlu">Flux de evenimente</h2>
+        <label class="comutator">
+          <input id="filtru-sintetic" type="checkbox" />
+          <span>Ascunde heartbeat</span>
+        </label>
+      </div>
+      <div class="tabel-container">
+        <table class="tabel">
+          <thead>
+            <tr><th>#</th><th>Ora</th><th>Dispozitiv</th><th>Tip</th><th>Rezultat</th><th>Origine</th><th>Sursă</th></tr>
+          </thead>
+          <tbody id="evenimente"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="panel.js"></script>
+</body>
+</html>

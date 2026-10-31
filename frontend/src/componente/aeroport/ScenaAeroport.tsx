@@ -21,6 +21,12 @@ const ETICHETE_SCENARIU: Record<ScenariuCamera, string> = {
   offline: 'Deconectare simulată',
 }
 
+const ETICHETE_STARE_SOC: Record<ScenariuCamera, string> = {
+  normal: 'Fără activitate suspectă',
+  avertizare: 'Activitate suspectă (SOC)',
+  offline: 'Indisponibilă',
+}
+
 const ETICHETE_CONEXIUNE: Record<StareConexiune, string> = {
   conectata: 'Conectată',
   instabila: 'Instabilă',
@@ -45,6 +51,12 @@ function descriereAnalizaMl(
   if (!detectie.disponibil) {
     // Fără flux video nu se atribuie un scor artificial.
     return null
+  }
+
+  if (camera.sursaDate === 'soc') {
+    return detectie.esteAnomalie
+      ? `Anomalie semnalată de SOC${detectie.scor === null ? '' : ` (scor ${formateazaScor(detectie.scor)} / prag ${formateazaScor(detectie.prag)})`}`
+      : 'Fără anomalii semnalate de SOC'
   }
 
   const scor = formateazaScor(detectie.scor)
@@ -152,8 +164,12 @@ export function ScenaAeroport({ stareCamera = null }: ProprietatiScenaAeroport) 
             )}
             {stareCamera && (
               <div className="marker-camera__panou-element">
-                <dt>Stare scenariu</dt>
-                <dd>{ETICHETE_SCENARIU[stareCamera.scenariu]}</dd>
+                <dt>{stareCamera.sursaDate === 'soc' ? 'Stare securitate' : 'Stare scenariu'}</dt>
+                <dd>
+                  {stareCamera.sursaDate === 'soc'
+                    ? ETICHETE_STARE_SOC[stareCamera.scenariu]
+                    : ETICHETE_SCENARIU[stareCamera.scenariu]}
+                </dd>
               </div>
             )}
             {stareCamera && descriereAnalizaMl(stareCamera) && (

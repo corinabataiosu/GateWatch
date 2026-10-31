@@ -15,8 +15,11 @@ export type StareConexiune = 'conectata' | 'instabila' | 'deconectata'
 /** Disponibilitatea fluxului video, independentă de rezultatul detectării de anomalii. */
 export type DisponibilitateFluxVideo = 'disponibil' | 'degradat' | 'intrerupt'
 
-/** Starea de securitate a camerei, fără a presupune un atac confirmat. */
-export type StareSecuritate = 'normala' | 'avertizare' | 'necunoscuta'
+/**
+ * Starea de securitate a camerei. „compromisa” este stabilită doar de SOC, pe baza detecțiilor;
+ * interfața nu deduce un atac din lipsa fluxului video.
+ */
+export type StareSecuritate = 'normala' | 'avertizare' | 'compromisa' | 'necunoscuta'
 
 /** Momentul ultimei actualizări, în format ISO 8601. */
 export type DataOraISO = string
@@ -24,8 +27,11 @@ export type DataOraISO = string
 /** Scenariile demonstrative disponibile pentru cameră. */
 export type ScenariuCamera = 'normal' | 'avertizare' | 'offline'
 
-/** Marchează explicit faptul că datele provin din simulare. */
-export type SursaDateCamera = 'simulare'
+/**
+ * Marchează explicit proveniența datelor: scenarii locale de simulare
+ * sau starea calculată de backend-ul SOC.
+ */
+export type SursaDateCamera = 'simulare' | 'soc'
 
 /** Identificatorul unic al unei alerte, de forma ALR-CAM-01-001. */
 export type IdentificatorAlerta = `ALR-${string}`
@@ -36,6 +42,7 @@ export type TipAlertaCamera =
   | 'obturare-posibila'
   | 'intrerupere-flux'
   | 'informare-demonstrativa'
+  | 'detectie-soc'
 
 /** Severitatea unei alerte. */
 export type SeveritateAlerta = 'informativa' | 'avertizare' | 'critica'

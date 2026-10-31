@@ -38,6 +38,7 @@ const STARI_FLUX: Record<DisponibilitateFluxVideo, StareAfisata> = {
 const STARI_SECURITATE: Record<StareSecuritate, StareAfisata> = {
   normala: { eticheta: 'Normală', clasa: 'buna' },
   avertizare: { eticheta: 'Avertizare', clasa: 'atentie' },
+  compromisa: { eticheta: 'Compromisă', clasa: 'alerta' },
   necunoscuta: { eticheta: 'Necunoscută', clasa: 'neutra' },
 }
 
@@ -45,6 +46,13 @@ const STARI_SCENARIU: Record<ScenariuCamera, StareAfisata> = {
   normal: { eticheta: 'Funcționare normală', clasa: 'buna' },
   avertizare: { eticheta: 'Anomalie simulată', clasa: 'atentie' },
   offline: { eticheta: 'Deconectare simulată', clasa: 'alerta' },
+}
+
+// În modul SOC starea nu provine dintr-un scenariu simulat, ci din detecțiile backend-ului.
+const STARI_SCENARIU_SOC: Record<ScenariuCamera, StareAfisata> = {
+  normal: { eticheta: 'Fără activitate suspectă', clasa: 'buna' },
+  avertizare: { eticheta: 'Activitate suspectă', clasa: 'atentie' },
+  offline: { eticheta: 'Indisponibilă', clasa: 'alerta' },
 }
 
 const STARI_SEVERITATE: Record<SeveritateAlerta, StareAfisata> = {
@@ -58,6 +66,7 @@ const ETICHETE_TIP_ALERTA: Record<TipAlertaCamera, string> = {
   'obturare-posibila': 'Obturare posibilă',
   'intrerupere-flux': 'Întrerupere flux',
   'informare-demonstrativa': 'Informare demonstrativă',
+  'detectie-soc': 'Detecție SOC',
 }
 
 const ETICHETE_SURSA: Record<SursaAlerta, string> = {
@@ -111,7 +120,22 @@ function obtineAnalizaMl(camera: CameraDemonstrativa): StareAfisata & {
     return {
       eticheta: 'Indisponibilă',
       clasa: 'neutra',
-      detaliu: 'Fără flux video; scorul nu este calculat.',
+      detaliu:
+        camera.sursaDate === 'soc'
+          ? 'Dispozitivul nu raportează; scorul nu este calculat.'
+          : 'Fără flux video; scorul nu este calculat.',
+    }
+  }
+
+  if (camera.sursaDate === 'soc') {
+    // Modelul SOC analizează evenimentele dispozitivului, nu cadre video.
+    return {
+      eticheta: detectie.esteAnomalie ? 'Anomalie detectată' : 'Fără anomalii',
+      clasa: detectie.esteAnomalie ? 'alerta' : 'buna',
+      detaliu:
+        detectie.scor === null
+          ? 'Analiză pe evenimentele dispozitivului'
+          : `Scor ${formateazaScor(detectie.scor)} · prag ${formateazaScor(detectie.prag)}`,
     }
   }
 
@@ -143,7 +167,10 @@ export function PanouStareCamera({
   const stareConexiune = STARI_CONEXIUNE[camera.stareConexiune]
   const stareFlux = STARI_FLUX[camera.disponibilitateFluxVideo]
   const stareSecuritate = STARI_SECURITATE[camera.stareSecuritate]
-  const stareScenariu = STARI_SCENARIU[scenariu]
+  const modSoc = camera.sursaDate === 'soc'
+  const stareScenariu = modSoc
+    ? STARI_SCENARIU_SOC[camera.scenariu]
+    : STARI_SCENARIU[scenariu]
   const analizaMl = obtineAnalizaMl(camera)
   const numarAlerte = camera.alerte.length
 
@@ -168,7 +195,9 @@ export function PanouStareCamera({
         </div>
 
         <div className="panou-stare-camera__insigne">
-          <span className="insigna-demonstrativa">Date simulate</span>
+          <span className="insigna-demonstrativa">
+            {modSoc ? 'Date SOC' : 'Date simulate'}
+          </span>
           <span
             className={`insigna-scenariu insigna-scenariu--${stareScenariu.clasa}`}
           >
@@ -178,7 +207,8 @@ export function PanouStareCamera({
       </header>
 
       <p className="panou-stare-camera__anunt" role="status">
-        Scenariu activ: {stareScenariu.eticheta}.{' '}
+        {modSoc ? 'Stare raportată de SOC' : 'Scenariu activ'}:{' '}
+        {stareScenariu.eticheta}.{' '}
         {numarAlerte === 0
           ? 'Nu există alerte active.'
           : `${numarAlerte} ${numarAlerte === 1 ? 'alertă activă' : 'alerte active'}.`}
@@ -227,78 +257,82 @@ export function PanouStareCamera({
         <span>Rezultat analiză:</span> {camera.detectieAnomalii.descriere}
       </p>
 
-      <section
-        className="panou-stare-camera__sectiune"
-        aria-labelledby="titlu-metrici-camera"
-      >
-        <h3
-          id="titlu-metrici-camera"
-          className="panou-stare-camera__titlu-sectiune"
+      {!modSoc && (
+        <section
+          className="panou-stare-camera__sectiune"
+          aria-labelledby="titlu-metrici-camera"
         >
-          Metrici vizuale
-        </h3>
-
-        <dl className="metrici-camera" aria-label="Metrici vizuale simulate">
-          <div className="metrici-camera__element">
-            <dt className="metrici-camera__eticheta">Luminozitate</dt>
-            <dd
-              className={`metrici-camera__valoare${clasaMetrica(camera.luminozitate)}`}
-            >
-              {formateazaMetrica(camera.luminozitate, 0)}
-            </dd>
-          </div>
-
-          <div className="metrici-camera__element">
-            <dt className="metrici-camera__eticheta">Claritate</dt>
-            <dd
-              className={`metrici-camera__valoare${clasaMetrica(camera.claritate)}`}
-            >
-              {formateazaMetrica(camera.claritate, 0)}
-            </dd>
-          </div>
-
-          <div className="metrici-camera__element">
-            <dt className="metrici-camera__eticheta">Diferență între cadre</dt>
-            <dd
-              className={`metrici-camera__valoare${clasaMetrica(camera.diferentaIntreCadre)}`}
-            >
-              {formateazaMetrica(camera.diferentaIntreCadre, 1)}
-            </dd>
-          </div>
-        </dl>
-      </section>
-
-      <fieldset className="panou-stare-camera__controale">
-        <legend className="panou-stare-camera__legenda">
-          Scenarii simulate
-        </legend>
-        <div className="panou-stare-camera__butoane">
-          <button
-            type="button"
-            className={`buton-scenariu${scenariu === 'normal' ? ' buton-scenariu--activ' : ''}`}
-            aria-pressed={scenariu === 'normal'}
-            onClick={onRevinoLaNormal}
+          <h3
+            id="titlu-metrici-camera"
+            className="panou-stare-camera__titlu-sectiune"
           >
-            Funcționare normală
-          </button>
-          <button
-            type="button"
-            className={`buton-scenariu${scenariu === 'avertizare' ? ' buton-scenariu--activ' : ''}`}
-            aria-pressed={scenariu === 'avertizare'}
-            onClick={() => onSchimbaScenariu('avertizare')}
-          >
-            Simulează anomalie
-          </button>
-          <button
-            type="button"
-            className={`buton-scenariu${scenariu === 'offline' ? ' buton-scenariu--activ' : ''}`}
-            aria-pressed={scenariu === 'offline'}
-            onClick={() => onSchimbaScenariu('offline')}
-          >
-            Simulează deconectare
-          </button>
-        </div>
-      </fieldset>
+            Metrici vizuale
+          </h3>
+
+          <dl className="metrici-camera" aria-label="Metrici vizuale simulate">
+            <div className="metrici-camera__element">
+              <dt className="metrici-camera__eticheta">Luminozitate</dt>
+              <dd
+                className={`metrici-camera__valoare${clasaMetrica(camera.luminozitate)}`}
+              >
+                {formateazaMetrica(camera.luminozitate, 0)}
+              </dd>
+            </div>
+
+            <div className="metrici-camera__element">
+              <dt className="metrici-camera__eticheta">Claritate</dt>
+              <dd
+                className={`metrici-camera__valoare${clasaMetrica(camera.claritate)}`}
+              >
+                {formateazaMetrica(camera.claritate, 0)}
+              </dd>
+            </div>
+
+            <div className="metrici-camera__element">
+              <dt className="metrici-camera__eticheta">Diferență între cadre</dt>
+              <dd
+                className={`metrici-camera__valoare${clasaMetrica(camera.diferentaIntreCadre)}`}
+              >
+                {formateazaMetrica(camera.diferentaIntreCadre, 1)}
+              </dd>
+            </div>
+          </dl>
+        </section>
+      )}
+
+      {!modSoc && (
+        <fieldset className="panou-stare-camera__controale">
+          <legend className="panou-stare-camera__legenda">
+            Scenarii simulate
+          </legend>
+          <div className="panou-stare-camera__butoane">
+            <button
+              type="button"
+              className={`buton-scenariu${scenariu === 'normal' ? ' buton-scenariu--activ' : ''}`}
+              aria-pressed={scenariu === 'normal'}
+              onClick={onRevinoLaNormal}
+            >
+              Funcționare normală
+            </button>
+            <button
+              type="button"
+              className={`buton-scenariu${scenariu === 'avertizare' ? ' buton-scenariu--activ' : ''}`}
+              aria-pressed={scenariu === 'avertizare'}
+              onClick={() => onSchimbaScenariu('avertizare')}
+            >
+              Simulează anomalie
+            </button>
+            <button
+              type="button"
+              className={`buton-scenariu${scenariu === 'offline' ? ' buton-scenariu--activ' : ''}`}
+              aria-pressed={scenariu === 'offline'}
+              onClick={() => onSchimbaScenariu('offline')}
+            >
+              Simulează deconectare
+            </button>
+          </div>
+        </fieldset>
+      )}
 
       <section
         className="panou-stare-camera__sectiune"
@@ -357,8 +391,9 @@ export function PanouStareCamera({
       </section>
 
       <p className="panou-stare-camera__nota">
-        Datele afișate sunt simulate exclusiv pentru demonstrație și nu
-        reprezintă măsurători reale.
+        {modSoc
+          ? 'Starea de securitate și alertele sunt calculate de SOC pe baza evenimentelor din simulatorul de infrastructură.'
+          : 'Datele afișate sunt simulate exclusiv pentru demonstrație și nu reprezintă măsurători reale.'}
       </p>
     </section>
   )

@@ -1,47 +1,38 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { ScenaAeroport } from '../aeroport/ScenaAeroport'
+import { PaginaCamere } from '../camere/PaginaCamere'
 import { PanouStareCamera } from '../camere/PanouStareCamera'
+import { IndicatoriSoc } from '../comune/IndicatoriSoc'
+import { PaginaIncidente } from '../incidente/PaginaIncidente'
+import { PaginaRapoarte } from '../rapoarte/PaginaRapoarte'
+import { PaginaRetea } from '../retea/PaginaRetea'
 import { useCameraDemonstrativa } from '../../carlige/useCameraDemonstrativa'
+import { useDateSoc, type DateSoc } from '../../carlige/useDateSoc'
+import { IDENTIFICATOR_CAMERA_DEMONSTRATIVA } from '../../dateSimulate/cameraSimulata'
+import { construiesteCameraDinSoc } from '../../servicii/serviciuCamera'
 import { Antet } from './Antet'
 import { MeniuLateral, type IdPagina } from './MeniuLateral'
 
-type DetaliiPaginaTemporara = {
-  titlu: string
-  mesaj: string
-}
-
-type PaginaFaraPanou = Exclude<IdPagina, 'panou'>
-
-const PAGINI_TEMPORARE: Record<PaginaFaraPanou, DetaliiPaginaTemporara> = {
-  camere: {
-    titlu: 'Camere',
-    mesaj:
-      'Modulul de monitorizare a camerelor este în pregătire. Aici vor fi afișate starea și fluxurile video ale echipamentelor de supraveghere.',
-  },
-  incidente: {
-    titlu: 'Incidente',
-    mesaj:
-      'Modulul de incidente este în pregătire. Aici vor fi centralizate alertele și evenimentele semnalate în aeroport.',
-  },
-  retea: {
-    titlu: 'Rețea',
-    mesaj:
-      'Modulul de rețea este în pregătire. Aici va fi afișată starea infrastructurii și a echipamentelor conectate.',
-  },
-  rapoarte: {
-    titlu: 'Rapoarte',
-    mesaj:
-      'Modulul de rapoarte este în pregătire. Aici vor putea fi generate și consultate rapoarte operaționale.',
-  },
-}
-
-function PanouPrincipal() {
+function PanouPrincipal({ soc }: { soc: DateSoc }) {
   const {
-    camera,
+    camera: cameraDemonstrativa,
     scenariu,
     seteazaScenariu,
     revinoLaNormal,
   } = useCameraDemonstrativa()
+
+  const dispozitivCamera = soc.conectat
+    ? soc.dispozitive.find(
+        (dispozitiv) => dispozitiv.device_id === IDENTIFICATOR_CAMERA_DEMONSTRATIVA,
+      )
+    : undefined
+
+  // Cu SOC disponibil, starea CAM-01 vine din SOC; altfel se folosește scenariul demonstrativ local.
+  const cameraSoc = useMemo(
+    () => (dispozitivCamera ? construiesteCameraDinSoc(dispozitivCamera, soc.alerte) : null),
+    [dispozitivCamera, soc.alerte],
+  )
+  const camera = cameraSoc ?? cameraDemonstrativa
 
   return (
     <section className="pagina" aria-labelledby="titlu-panou">
@@ -54,6 +45,17 @@ function PanouPrincipal() {
           Monitorizarea securității și disponibilității sistemelor de supraveghere
         </p>
       </header>
+
+      {soc.conectat ? (
+        <IndicatoriSoc soc={soc} />
+      ) : (
+        <p className="anunt-mod-demonstrativ" role="status">
+          <strong>Mod demonstrativ.</strong>{' '}
+          {soc.seIncarca
+            ? 'Se verifică conexiunea cu SOC...'
+            : 'Backend-ul SOC nu este accesibil; camera CAM-01 afișează scenarii locale simulate.'}
+        </p>
+      )}
 
       <div
         className="spatiu-3d"
@@ -80,28 +82,24 @@ function PanouPrincipal() {
   )
 }
 
-function ContinutTemporar({ pagina }: { pagina: PaginaFaraPanou }) {
-  const detalii = PAGINI_TEMPORARE[pagina]
-
-  return (
-    <section className="pagina" aria-labelledby={`titlu-${pagina}`}>
-      <header className="pagina__antet">
-        <p className="pagina__eticheta">Secțiune</p>
-        <h1 id={`titlu-${pagina}`} className="pagina__titlu">
-          {detalii.titlu}
-        </h1>
-      </header>
-
-      <div className="pagina-temporara">
-        <span className="pagina-temporara__eticheta">În pregătire</span>
-        <p className="pagina-temporara__mesaj">{detalii.mesaj}</p>
-      </div>
-    </section>
-  )
+function ContinutPagina({ pagina, soc }: { pagina: IdPagina; soc: DateSoc }) {
+  switch (pagina) {
+    case 'panou':
+      return <PanouPrincipal soc={soc} />
+    case 'camere':
+      return <PaginaCamere soc={soc} />
+    case 'incidente':
+      return <PaginaIncidente soc={soc} />
+    case 'retea':
+      return <PaginaRetea soc={soc} />
+    case 'rapoarte':
+      return <PaginaRapoarte soc={soc} />
+  }
 }
 
 export function StructuraAplicatiei() {
   const [paginaActiva, setPaginaActiva] = useState<IdPagina>('panou')
+  const soc = useDateSoc()
 
   return (
     <div className="structura-aplicatie">
@@ -109,7 +107,7 @@ export function StructuraAplicatiei() {
         Sari la conținutul principal
       </a>
 
-      <Antet />
+      <Antet socConectat={soc.conectat} seIncarca={soc.seIncarca} />
 
       <div className="corp-aplicatie">
         <MeniuLateral
@@ -118,11 +116,7 @@ export function StructuraAplicatiei() {
         />
 
         <main id="continut-principal" className="continut-principal" tabIndex={-1}>
-          {paginaActiva === 'panou' ? (
-            <PanouPrincipal />
-          ) : (
-            <ContinutTemporar pagina={paginaActiva} />
-          )}
+          <ContinutPagina pagina={paginaActiva} soc={soc} />
         </main>
       </div>
     </div>

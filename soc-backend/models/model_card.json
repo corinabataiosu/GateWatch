@@ -1,0 +1,27 @@
+{
+  "feature_names": [
+    "n_events",
+    "n_auth_fail",
+    "n_auth_success",
+    "n_distinct_src_ips",
+    "n_external_src",
+    "n_data_access",
+    "n_export",
+    "n_config",
+    "n_destructive",
+    "n_badge_denied",
+    "n_restricted_badge",
+    "off_hours",
+    "failure_ratio"
+  ],
+  "threshold": 0.6985102319937163,
+  "version": "iforest-202610310947",
+  "trained_at": "2026-10-31T09:47:09.195718+00:00",
+  "n_samples": 25946,
+  "score_p50": 0.33398778241726634,
+  "score_p99": 0.6071835546207567,
+  "sources": [
+    "synthetic",
+    "sim_baseline.jsonl"
+  ]
+}

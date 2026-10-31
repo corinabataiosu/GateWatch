@@ -1,4 +1,16 @@
-export function Antet() {
+type ProprietatiAntet = {
+  socConectat: boolean
+  seIncarca: boolean
+}
+
+export function Antet({ socConectat, seIncarca }: ProprietatiAntet) {
+  const eticheta = seIncarca
+    ? 'Conectare la SOC...'
+    : socConectat
+      ? 'SOC conectat'
+      : 'SOC indisponibil · mod demonstrativ'
+  const modificator = seIncarca ? 'asteptare' : socConectat ? 'conectat' : 'deconectat'
+
   return (
     <header className="antet">
       <div className="antet__marca">
@@ -12,9 +24,12 @@ export function Antet() {
       </div>
 
       <div className="antet__actiuni">
-        <span className="indicator-demonstrativ">
+        <span
+          className={`indicator-demonstrativ indicator-demonstrativ--${modificator}`}
+          role="status"
+        >
           <span className="indicator-demonstrativ__punct" aria-hidden="true" />
-          Mod demonstrativ
+          {eticheta}
         </span>
       </div>
     </header>

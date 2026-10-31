@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ScenaAeroport } from '../aeroport/ScenaAeroport'
 import { PanouStareCamera } from '../camere/PanouStareCamera'
 import { Antet } from './Antet'
 import { MeniuLateral, type IdPagina } from './MeniuLateral'
@@ -49,39 +50,16 @@ function PanouPrincipal() {
       <div
         className="spatiu-3d"
         role="region"
-        aria-labelledby="titlu-spatiu-3d"
-        aria-describedby="descriere-spatiu-3d"
+        aria-label="Vizualizare 3D a aeroportului"
       >
         <div className="spatiu-3d__bara">
           <span className="spatiu-3d__eticheta">Vizualizare 3D</span>
-          <span className="spatiu-3d__stare">În pregătire</span>
+          <span className="spatiu-3d__stare spatiu-3d__stare--activ">
+            Interactiv
+          </span>
         </div>
 
-        <div className="spatiu-3d__continut">
-          <svg
-            className="spatiu-3d__icon"
-            viewBox="0 0 64 64"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-            focusable="false"
-          >
-            <path d="M32 8 56 21v22L32 56 8 43V21L32 8Z" />
-            <path d="M8 21l24 13 24-13" />
-            <path d="M32 34v22" />
-          </svg>
-
-          <h2 id="titlu-spatiu-3d" className="spatiu-3d__titlu">
-            Modelul 3D al aeroportului
-          </h2>
-          <p id="descriere-spatiu-3d" className="spatiu-3d__text">
-            Această suprafață este rezervată pentru vizualizarea tridimensională a
-            aeroportului și a sistemelor de supraveghere.
-          </p>
-        </div>
+        <ScenaAeroport />
       </div>
 
       <PanouStareCamera />

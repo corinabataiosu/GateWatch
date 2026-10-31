@@ -270,12 +270,12 @@
   color: var(--text-secundar);
 }
 
-/* Spațiu rezervat pentru modelul 3D */
+/* Vizualizare 3D */
 
 .spatiu-3d {
   display: flex;
   flex-direction: column;
-  min-height: clamp(320px, 58vh, 620px);
+  min-height: clamp(360px, 62vh, 680px);
   overflow: hidden;
   background-color: var(--fundal-suprafata);
   border: 1px solid var(--chenar);
@@ -321,41 +321,93 @@
   background-color: var(--chenar-puternic);
 }
 
-.spatiu-3d__continut {
-  display: flex;
+.spatiu-3d__stare--activ {
+  background-color: #e7f6ee;
+  color: #16794a;
+}
+
+.spatiu-3d__stare--activ::before {
+  background-color: #1f9d63;
+}
+
+.scena-aeroport {
+  position: relative;
   flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background-image: linear-gradient(180deg, #fafcfe 0%, #e9eef6 100%);
+  touch-action: none;
+}
+
+.scena-aeroport__eticheta {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  z-index: 2;
+  padding: 5px 10px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.86);
+  color: var(--text-secundar);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.scena-aeroport__indiciu {
+  position: absolute;
+  right: 16px;
+  bottom: 14px;
+  z-index: 2;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.78);
+  color: var(--text-discret);
+  font-size: 0.75rem;
+  pointer-events: none;
+}
+
+.scena-aeroport__incarcare {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 40px 24px;
-  background-image: radial-gradient(
-    circle,
-    rgba(148, 163, 184, 0.18) 1px,
-    transparent 1px
-  );
-  background-size: 22px 22px;
+  gap: 10px;
+  background-color: #f2f6fb;
+  color: var(--text-secundar);
+  font-size: 0.875rem;
+}
+
+.scena-aeroport__spinner {
+  width: 26px;
+  height: 26px;
+  border: 3px solid rgba(29, 78, 216, 0.18);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: rotire-incarcare 0.8s linear infinite;
+}
+
+.scena-aeroport__fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 24px;
+  background-color: #f2f6fb;
+  color: var(--text-secundar);
   text-align: center;
 }
 
-.spatiu-3d__icon {
-  width: 64px;
-  height: 64px;
-  color: #b6c4da;
-}
-
-.spatiu-3d__titlu {
-  margin: 0;
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--text-principal);
-}
-
-.spatiu-3d__text {
-  max-width: 48ch;
-  margin: 0;
-  font-size: 0.9375rem;
-  color: var(--text-secundar);
+@keyframes rotire-incarcare {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Pagini temporare */
@@ -486,12 +538,20 @@
   }
 
   .spatiu-3d {
-    min-height: 300px;
+    min-height: 360px;
     border-radius: var(--raza);
   }
 
-  .spatiu-3d__continut {
-    padding: 32px 18px;
+  .scena-aeroport__eticheta {
+    top: 10px;
+    left: 10px;
+    font-size: 0.625rem;
+  }
+
+  .scena-aeroport__indiciu {
+    right: 10px;
+    bottom: 10px;
+    font-size: 0.6875rem;
   }
 
   .pagina-temporara {

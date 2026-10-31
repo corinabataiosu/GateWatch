@@ -8,7 +8,6 @@ import {
   formateazaNumarIntreg,
 } from '../../servicii/formatare'
 import {
-  AntetPagina,
   Card,
   Insigna,
   MesajSocIndisponibil,
@@ -65,7 +64,7 @@ export function PaginaRapoarte({ soc }: { soc?: DateSoc }) {
   const [categorieSelectata, setCategorieSelectata] = useState<CategorieRaport | null>(null)
   const [raportVizualizat, setRaportVizualizat] = useState<RaportSalvat | null>(null)
   const [raportDeSters, setRaportDeSters] = useState<RaportSalvat | null>(null)
-  const [mesajNotificare, setMesajNotificare] = useState<string | null>(null)
+  const [, setMesajNotificare] = useState<string | null>(null)
 
   const afiseazaNotificare = (mesaj: string) => {
     setMesajNotificare(mesaj)

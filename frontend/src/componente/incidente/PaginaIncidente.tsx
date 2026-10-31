@@ -16,7 +16,6 @@ import {
 } from '../../servicii/formatare'
 import type { DetaliiIncidentSoc, IncidentSoc, StareIncident } from '../../tipuri/soc'
 import {
-  AntetPagina,
   Card,
   Insigna,
   MesajSocIndisponibil,

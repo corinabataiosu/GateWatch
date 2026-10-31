@@ -1,4 +1,3 @@
-import { useCameraDemonstrativa } from '../../carlige/useCameraDemonstrativa'
 import type {
   CameraDemonstrativa,
   DisponibilitateFluxVideo,
@@ -15,6 +14,13 @@ type ClasaStare = 'buna' | 'atentie' | 'alerta' | 'neutra'
 type StareAfisata = {
   eticheta: string
   clasa: ClasaStare
+}
+
+type ProprietatiPanouStareCamera = {
+  camera: CameraDemonstrativa
+  scenariu: ScenariuCamera
+  onSchimbaScenariu: (scenariu: ScenariuCamera) => void
+  onRevinoLaNormal: () => void
 }
 
 const STARI_CONEXIUNE: Record<StareConexiune, StareAfisata> = {
@@ -128,14 +134,12 @@ function clasaMetrica(valoare: number | null): string {
   return valoare === null ? ' metrici-camera__valoare--indisponibil' : ''
 }
 
-export function PanouStareCamera() {
-  const {
-    scenariu,
-    camera,
-    seteazaScenariu,
-    revinoLaNormal,
-  } = useCameraDemonstrativa()
-
+export function PanouStareCamera({
+  camera,
+  scenariu,
+  onSchimbaScenariu,
+  onRevinoLaNormal,
+}: ProprietatiPanouStareCamera) {
   const stareConexiune = STARI_CONEXIUNE[camera.stareConexiune]
   const stareFlux = STARI_FLUX[camera.disponibilitateFluxVideo]
   const stareSecuritate = STARI_SECURITATE[camera.stareSecuritate]
@@ -273,7 +277,7 @@ export function PanouStareCamera() {
             type="button"
             className={`buton-scenariu${scenariu === 'normal' ? ' buton-scenariu--activ' : ''}`}
             aria-pressed={scenariu === 'normal'}
-            onClick={revinoLaNormal}
+            onClick={onRevinoLaNormal}
           >
             Funcționare normală
           </button>
@@ -281,7 +285,7 @@ export function PanouStareCamera() {
             type="button"
             className={`buton-scenariu${scenariu === 'avertizare' ? ' buton-scenariu--activ' : ''}`}
             aria-pressed={scenariu === 'avertizare'}
-            onClick={() => seteazaScenariu('avertizare')}
+            onClick={() => onSchimbaScenariu('avertizare')}
           >
             Simulează anomalie
           </button>
@@ -289,7 +293,7 @@ export function PanouStareCamera() {
             type="button"
             className={`buton-scenariu${scenariu === 'offline' ? ' buton-scenariu--activ' : ''}`}
             aria-pressed={scenariu === 'offline'}
-            onClick={() => seteazaScenariu('offline')}
+            onClick={() => onSchimbaScenariu('offline')}
           >
             Simulează deconectare
           </button>

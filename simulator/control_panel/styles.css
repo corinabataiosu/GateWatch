@@ -122,3 +122,42 @@ input[type="password"], input[type="number"] {
 .tabel tr.origine--observed_http td { background: #fff8e8; }
 .rezultat--failure { color: var(--alerta); font-weight: 600; }
 .rezultat--success { color: var(--bun); }
+
+/* Keep the application's restrained blue, white and slate workstation theme. */
+:root { --fundal: #f3f5f8; --text: #0f172a; --text-secundar: #51607a; --accent: #1d4ed8; --chenar: #e2e8f0; }
+.grila { max-width: 1600px; margin: auto; grid-template-columns: minmax(340px, 1.1fr) minmax(320px, 1fr); align-items: start; }
+.card--rulare, .card--scenariu { grid-column: 1 / -1; }
+.card--rulare .campuri { grid-template-columns: repeat(4, 1fr); }
+.card--rulare .camp-token { max-width: 340px; }
+.card--manual { grid-row: span 2; border-top: 3px solid var(--accent); }
+.card--scenariu summary { cursor: pointer; font-weight: 600; font-size: .85rem; }
+.card--scenariu details[open] summary { margin-bottom: 20px; }
+.field { display: flex; flex-direction: column; gap: 6px; margin: 0 0 14px; font-size: .82rem; font-weight: 600; }
+.field input, .field select { min-width: 0; width: 100%; padding: 10px 11px; border: 1px solid var(--chenar); border-radius: 6px; background: white; color: var(--text); font: inherit; font-weight: 400; }
+.field small, .hint { font-size: .78rem; font-weight: 400; color: var(--text-secundar); line-height: 1.55; }
+.hint { margin: 8px 0 16px; }
+.settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+fieldset { padding: 14px 0 0; margin: 20px 0 0; border: 0; border-top: 1px solid var(--chenar); }
+legend { padding: 0 10px 0 0; font-size: .82rem; font-weight: 600; }
+.device-summary { background: #f3f6fc; border-left: 3px solid var(--accent); padding: 14px; grid-template-columns: repeat(3, 1fr); }
+.traffic-preview { padding: 12px; background: #f3f6fc; font-size: .8rem; line-height: 1.6; overflow-wrap: anywhere; }
+.execute { width: 100%; padding: 12px; }
+.execution-area { margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--chenar); }
+.execution-area h3 { font-size: .9rem; margin: 0 0 16px; }
+.execution { padding-top: 14px; border-top: 1px solid var(--chenar); }
+.execution:first-child { padding-top: 0; border: 0; }
+.execution .card__antet { align-items: start; font-size: .85rem; }
+.execution-id { font: .7rem ui-monospace, monospace; color: var(--text-secundar); overflow-wrap: anywhere; }
+.execution .campuri dd { font-size: .78rem; overflow-wrap: anywhere; word-break: normal; }
+.dispozitiv { cursor: pointer; }
+.dispozitiv--selected circle { stroke: var(--accent); stroke-width: 5; }
+.dispozitiv--selected text { font-weight: 800; fill: var(--accent); }
+.event-filter { max-width: 300px; }
+:focus-visible { outline: 3px solid #8baeed; outline-offset: 3px; }
+[hidden] { display: none !important; }
+@media (max-width: 960px) { .grila { grid-template-columns: 1fr; } .card--manual { grid-row: auto; } }
+@media (max-width: 540px) {
+  .grila { padding: 12px; } .antet { padding: 12px; align-items: start; } .antet__subtitlu { max-width: 220px; }
+  .settings-grid, .card--rulare .campuri, .device-summary { grid-template-columns: 1fr 1fr; }
+  .etapa { grid-template-columns: 26px 1fr; } .etapa__mitre { grid-column: 2; }
+}

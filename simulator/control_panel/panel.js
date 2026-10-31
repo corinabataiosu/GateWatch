@@ -35,7 +35,7 @@
     if (!raspuns.ok) {
       let detaliu = raspuns.statusText
       try { detaliu = (await raspuns.json()).detail || detaliu } catch (_) { /* fără corp JSON */ }
-      throw new Error(`${raspuns.status}: ${detaliu}`)
+      throw new Error(`${raspuns.status}: ${typeof detaliu === 'string' ? detaliu : JSON.stringify(detaliu)}`)
     }
     return raspuns.json()
   }
@@ -68,6 +68,7 @@
     rate: Number($('baseline-rata').value) || 1,
   })))
   $('filtru-sintetic').addEventListener('change', randeazaEvenimente)
+  $('event-device').addEventListener('change', randeazaEvenimente)
 
   function randeazaHarta(dispozitive) {
     const grup = $('harta-dispozitive')
@@ -85,13 +86,18 @@
         const activ = acum - (stare.activitate[d.device_id] || 0) < ACTIVITATE_RECENTA_MS
         const clase = `dispozitiv dispozitiv--${d.status}${activ ? ' dispozitiv--activ' : ''}`
         fragmente.push(
-          `<g class="${clase}"><title>${d.device_id} · ${d.name} · ${d.ip} · ${d.status}</title>` +
+          `<g class="${clase}" data-device="${esc(d.device_id)}" role="button" tabindex="0" aria-label="Select ${esc(d.device_id)}"><title>${d.device_id} · ${d.name} · ${d.ip} · ${d.status}</title>` +
           `<circle cx="${x}" cy="${y}" r="12"></circle>` +
           `<text x="${x}" y="${y + 28}">${d.device_id}</text></g>`,
         )
       })
     })
     grup.innerHTML = fragmente.join('')
+    grup.querySelectorAll('[data-device]').forEach((marker) => {
+      const select = () => document.dispatchEvent(new CustomEvent('select-device', { detail: marker.dataset.device }))
+      marker.addEventListener('click', select)
+      marker.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select() } })
+    })
   }
 
   function randeazaScenariu(scenariu) {
@@ -120,10 +126,11 @@
     const ora = new Intl.DateTimeFormat('ro-RO', { timeStyle: 'medium', timeZone: 'Europe/Bucharest' })
     $('evenimente').innerHTML = stare.evenimente
       .filter((e) => !(ascundeHeartbeat && e.event_type === 'heartbeat'))
+      .filter((e) => !$('event-device').value || e.device_id === $('event-device').value)
       .map((e) => `<tr class="origine--${esc(e.origin)}"><td>${esc(e.seq)}</td>` +
         `<td>${ora.format(new Date(e.occurred_at))}</td><td>${esc(e.device_id)}</td><td>${esc(e.event_type)}</td>` +
         `<td class="rezultat--${esc(e.outcome)}">${esc(e.outcome)}</td><td>${esc(e.origin)}</td>` +
-        `<td>${esc(e.source.ip)}${e.source.user ? ' · ' + esc(e.source.user) : ''}</td></tr>`)
+        `<td>${esc(e.source.ip)} → ${esc(e.target.ip)}${e.target.port ? ':' + esc(e.target.port) : ''}</td></tr>`)
       .join('')
   }
 

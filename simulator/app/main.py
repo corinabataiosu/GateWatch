@@ -14,6 +14,7 @@ from pydantic import BaseModel
 from .config import Settings
 from .services import build_router
 from .state import Simulator
+from .attacks import AttackRequest, CATALOG
 
 PANEL_DIR = Path(__file__).resolve().parent.parent / "control_panel"
 
@@ -54,6 +55,21 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             raise HTTPException(401, "Token de administrare lipsă sau invalid.")
 
     admin = [Depends(require_admin)]
+
+    @app.get("/sim/attacks")
+    def attacks():
+        return CATALOG
+
+    @app.get("/sim/executions")
+    def executions():
+        return sim.store.list_executions()
+
+    @app.post("/sim/attacks/execute", dependencies=admin)
+    def execute_attack(body: AttackRequest):
+        try:
+            return sim.attacks.execute(body)
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
 
     @app.get("/sim/health")
     def health():
@@ -100,7 +116,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @app.post("/sim/scenario/start", dependencies=admin)
     def scenario_start(body: ScenarioStartBody | None = None):
-        return sim.scenario.start((body or ScenarioStartBody()).mode)
+        with sim.attacks.lock:
+            return sim.scenario.start((body or ScenarioStartBody()).mode)
 
     @app.post("/sim/scenario/step", dependencies=admin)
     def scenario_step():

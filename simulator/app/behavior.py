@@ -121,6 +121,19 @@ class BaselineEngine:
             source={"ip": device.ip, "user": None, "zone": device.zone},
             details={"cpu_pct": self._rng.randint(4, 35), "uptime_s": self._rng.randint(10_000, 900_000)},
         )
+        # Normal profile used by the SOC's virtual-flow thresholds (100 pps, 64 KB/s).
+        destination = self.sim.registry.get("NVR-01" if device.type == "camera" else "IOT-GW-01")
+        if destination.status == "online" and destination != device:
+            from datetime import datetime, timedelta, timezone
+            end = datetime.now(timezone.utc)
+            self.sim.emit(device, "network_flow", "info", "synthetic",
+                source={"ip": device.ip, "zone": device.zone},
+                target={"ip": destination.ip, "port": 554 if device.type == "camera" else 8883,
+                        "service": "rtsp" if device.type == "camera" else "mqtt"},
+                details={"interval_start": (end - timedelta(seconds=1)).isoformat(),
+                         "interval_end": end.isoformat(), "duration_s": 1, "packet_count": 100,
+                         "packets_per_second": 100, "total_bytes": 64000, "bytes_per_second": 64000,
+                         "direction": "internal"})
 
     def _staff_login(self, active) -> None:
         targets = [d for d in active if d.type in ("camera", "nvr")]
@@ -129,9 +142,6 @@ class BaselineEngine:
         device = self._rng.choice(targets)
         user, ip = self._rng.choice(STAFF)
         source = {"ip": ip, "user": user, "zone": "operations"}
-        if self._rng.random() < 0.1:  # an occasional typo before a successful login
-            self.sim.emit(device, "auth_login", "failure", "synthetic", source=source,
-                          details={"username": user, "method": "web", "reason": "invalid_password"})
         self.sim.emit(device, "auth_login", "success", "synthetic", source=source,
                       details={"username": user, "method": "web"})
         if device.type == "nvr" and self._rng.random() < 0.5:

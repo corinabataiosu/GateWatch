@@ -289,6 +289,7 @@ class AntiForensicsRule(Rule):
 class RuleEngine:
     def __init__(self) -> None:
         failures = Window(120)
+        from .manual_rules import observation_rules
         self.rules: list[Rule] = [
             BruteForceRule(failures),
             SuccessAfterBruteForceRule(failures),
@@ -298,6 +299,7 @@ class RuleEngine:
             RecordingExfiltrationRule(),
             ImpossibleBadgeTravelRule(),
             AntiForensicsRule(),
+            *observation_rules(),
         ]
 
     def evaluate(self, event: Event) -> list[AlertDraft]:

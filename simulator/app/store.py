@@ -28,6 +28,12 @@ CREATE TABLE IF NOT EXISTS events (
     payload TEXT NOT NULL,
     PRIMARY KEY (run_id, seq)
 );
+CREATE TABLE IF NOT EXISTS executions (
+    execution_id TEXT PRIMARY KEY,
+    run_id TEXT NOT NULL,
+    request TEXT NOT NULL,
+    payload TEXT NOT NULL
+);
 """
 
 
@@ -100,4 +106,24 @@ class EventStore:
                 "SELECT payload FROM events WHERE run_id = ? AND seq > ? ORDER BY seq LIMIT ?",
                 (run_id, after_seq, limit),
             ).fetchall()
+        return [json.loads(r["payload"]) for r in rows]
+
+    def save_execution(self, request: dict, result: dict) -> None:
+        with self._lock:
+            self._conn.execute(
+                "INSERT OR REPLACE INTO executions VALUES (?, ?, ?, ?)",
+                (result["execution_id"], result["run_id"], json.dumps(request), json.dumps(result)),
+            )
+            self._conn.commit()
+
+    def get_execution(self, execution_id: str) -> tuple[dict, dict] | None:
+        with self._lock:
+            row = self._conn.execute("SELECT request, payload FROM executions WHERE execution_id = ?",
+                                     (execution_id,)).fetchone()
+        return (json.loads(row["request"]), json.loads(row["payload"])) if row else None
+
+    def list_executions(self) -> list[dict]:
+        with self._lock:
+            rows = self._conn.execute("SELECT payload FROM executions WHERE run_id = ? ORDER BY rowid DESC LIMIT 20",
+                                      (self.current_run_id,)).fetchall()
         return [json.loads(r["payload"]) for r in rows]

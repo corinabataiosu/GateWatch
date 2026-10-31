@@ -4,6 +4,23 @@ A virtual airport security network: 15 devices across 4 zones. It generates synt
 
 ## Run
 
+Open `/panel/` for manual testing: select a device, choose one of six attacks, configure it,
+then click **Execute Attack** using the existing administration token. Baseline controls are
+independent; the legacy scenario remains under its optional disclosure and must be stopped
+before a manual execution. A new run resets the devices and event cursor, preserving history.
+
+`GET /sim/attacks` lists profiles; authenticated `POST /sim/attacks/execute` requires a UUID
+`execution_id`, `device_id` and `attack`. Reusing an ID with identical parameters returns the
+persisted result without generating more events. `GET /sim/executions` returns the latest
+20 executions in the current run. External addresses must be fictional TEST-NET IPv4 addresses.
+
+New factual event types are `connection_attempt`, `access_denied` and `network_flow`.
+Flow details contain one-second intervals, packet counts/rates and byte counts/rates.
+Observations replay immediately in compressed virtual time; `occurred_at` is recording time,
+while `details.virtual_occurred_at` and interval bounds describe virtual time. Baseline flows
+use 100 pps / 64 KB/s. The SOC independently evaluates facts and its own policy (GW-R09–R13,
+plus existing brute-force rule GW-R01). Simulator completion makes no detection claim.
+
 ```bash
 pip install -r simulator/requirements.txt
 python simulator/run.py            # http://127.0.0.1:8001

@@ -13,6 +13,7 @@ class Simulator:
     def __init__(self, settings: Settings) -> None:
         from .behavior import BaselineEngine
         from .scenario import ScenarioEngine
+        from .attacks import AttackEngine
 
         self.settings = settings
         self.registry = DeviceRegistry()
@@ -21,6 +22,7 @@ class Simulator:
             self.store.start_run()
         self.baseline = BaselineEngine(self)
         self.scenario = ScenarioEngine(self)
+        self.attacks = AttackEngine(self)
         # Bearer sessions for the interactive services: token -> (device_id, user).
         self.sessions: dict[str, tuple[str, str]] = {}
 
@@ -51,6 +53,10 @@ class Simulator:
         return stored
 
     def new_run(self) -> dict:
+        with self.attacks.lock:
+            return self._new_run()
+
+    def _new_run(self) -> dict:
         self.scenario.stop()
         self.scenario.reset()
         self.registry.reset()

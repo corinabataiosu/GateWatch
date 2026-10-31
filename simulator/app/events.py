@@ -9,7 +9,7 @@ EVENT_TYPES = frozenset({
     "heartbeat", "auth_login", "auth_logout", "config_change", "firmware_update",
     "stream_status", "snapshot_access", "recording_access", "recording_export",
     "recording_delete", "badge_access", "door_state", "vpn_session", "network_scan",
-    "log_cleared",
+    "log_cleared", "connection_attempt", "access_denied", "network_flow",
 })
 OUTCOMES = frozenset({"success", "failure", "info"})
 ORIGINS = frozenset({"synthetic", "scenario_generated", "observed_http"})

@@ -52,12 +52,6 @@ export function PaginaRapoarte({ soc }: { soc: DateSoc }) {
 
   return (
     <section className="pagina" aria-labelledby="titlu-rapoarte">
-      <AntetPagina
-        id="titlu-rapoarte"
-        eticheta="Secțiune"
-        titlu="Rapoarte"
-        subtitlu="Sinteza detecțiilor SOC: incidente, alerte detectate, severități și surse de detecție."
-      />
 
       {!soc.conectat && !soc.seIncarca ? (
         <MesajSocIndisponibil eroare={soc.eroare} />

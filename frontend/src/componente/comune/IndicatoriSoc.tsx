@@ -1,5 +1,5 @@
 import type { DateSoc } from '../../carlige/useDateSoc'
-import { formateazaNumarIntreg, formateazaOra } from '../../servicii/formatare'
+import { formateazaNumarIntreg } from '../../servicii/formatare'
 
 type Indicator = {
   eticheta: string
@@ -10,10 +10,9 @@ type Indicator = {
 /** Rând compact de indicatori principali ai SOC. */
 export function IndicatoriSoc({ soc }: { soc: DateSoc }) {
   const prezentare = soc.prezentare
-  const ingestie = soc.sanatate?.ingestion
 
   const indicatori: Indicator[] = [
-    { eticheta: 'Evenimente ingerate', valoare: formateazaNumarIntreg(prezentare?.events_total) },
+    { eticheta: 'Evenimente', valoare: formateazaNumarIntreg(prezentare?.events_total) },
     {
       eticheta: 'Alerte deschise',
       valoare: formateazaNumarIntreg(prezentare?.alerts_open),
@@ -46,22 +45,6 @@ export function IndicatoriSoc({ soc }: { soc: DateSoc }) {
           </li>
         ))}
       </ul>
-      <p className="indicatori-soc__stare">
-        {ingestie ? (
-          <>
-            Ingestie:{' '}
-            <strong>{ingestie.connected ? 'simulator conectat' : 'simulator indisponibil'}</strong>
-            {ingestie.run_id && <> · rulare {ingestie.run_id} · seq {ingestie.last_seq}</>}
-            {ingestie.error && <> · {ingestie.error}</>}
-            {soc.sanatate?.model && (
-              <> · model ML {soc.sanatate.model.loaded ? `încărcat (${soc.sanatate.model.version ?? 'n/a'})` : 'neîncărcat'}</>
-            )}
-            {' '}· actualizat {formateazaOra(soc.ultimaActualizare)}
-          </>
-        ) : (
-          'Starea ingestiei nu este disponibilă.'
-        )}
-      </p>
     </div>
   )
 }

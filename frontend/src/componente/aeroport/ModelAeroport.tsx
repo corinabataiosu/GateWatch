@@ -9,6 +9,16 @@ import {
   Vector3,
   type PerspectiveCamera,
 } from 'three'
+import { MarkerCamera } from './MarkerCamera'
+import type { IdentificatorCamera } from '../../tipuri/camera'
+
+type ProprietatiModelAeroport = {
+  identificatorSelectat?: IdentificatorCamera | null
+  onSelecteazaCamera?: (identificator: IdentificatorCamera) => void
+}
+
+const IDENTIFICATOR_MARKER: IdentificatorCamera = 'CAM-01'
+const POZITIE_MARKER: [number, number, number] = [4.4, 0, -5.6]
 
 type Pozitie3D = [number, number, number]
 
@@ -661,7 +671,10 @@ function Cadrare() {
   return null
 }
 
-export function ModelAeroport() {
+export function ModelAeroport({
+  identificatorSelectat = null,
+  onSelecteazaCamera,
+}: ProprietatiModelAeroport) {
   return (
     <>
       <ambientLight intensity={0.55} />
@@ -701,6 +714,13 @@ export function ModelAeroport() {
         <Hangar />
         <Aeronava pozitie={[-8, 0.1, -1.5]} />
         <Aeronava pozitie={[8, 0.1, -1.5]} />
+
+        <MarkerCamera
+          pozitie={POZITIE_MARKER}
+          identificator={IDENTIFICATOR_MARKER}
+          selectat={identificatorSelectat === IDENTIFICATOR_MARKER}
+          onSelecteaza={onSelecteazaCamera}
+        />
       </group>
 
       <Cadrare />

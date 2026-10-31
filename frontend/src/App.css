@@ -404,6 +404,107 @@
   text-align: center;
 }
 
+/* Marker camera CAM-01 */
+
+.marker-camera__eticheta {
+  display: inline-block;
+  padding: 2px 8px;
+  border: 1px solid rgba(63, 120, 168, 0.45);
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 1px 3px rgba(15, 40, 70, 0.12);
+  color: #2f6c9e;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.marker-camera__eticheta--activ {
+  border-color: rgba(47, 108, 158, 0.8);
+  background-color: #eef5fb;
+}
+
+.marker-camera__panou {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  z-index: 4;
+  width: min(252px, calc(100% - 32px));
+  padding: 14px 16px 13px;
+  background-color: rgba(255, 255, 255, 0.96);
+  border: 1px solid var(--chenar);
+  border-radius: var(--raza-mica);
+  box-shadow: var(--umbra-suprafata);
+}
+
+.marker-camera__panou-antet {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.marker-camera__panou-titlu {
+  margin: 0;
+  color: var(--text-principal);
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+
+.marker-camera__panou-inchide {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background-color: transparent;
+  color: var(--text-discret);
+  font-size: 0.9375rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.marker-camera__panou-inchide:hover {
+  background-color: #eef2f8;
+  color: var(--text-secundar);
+}
+
+.marker-camera__panou-campuri {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.marker-camera__panou-element dt {
+  margin-bottom: 2px;
+  color: var(--text-discret);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.marker-camera__panou-element dd {
+  margin: 0;
+  color: var(--text-principal);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.marker-camera__panou-nota {
+  margin: 12px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--chenar);
+  color: var(--text-discret);
+  font-size: 0.75rem;
+}
+
 @keyframes rotire-incarcare {
   to {
     transform: rotate(360deg);

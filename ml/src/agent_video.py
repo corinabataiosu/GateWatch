@@ -10,6 +10,8 @@ Exemple (din radacina proiectului, cu SOC-ul pornit):
     python ml/src/agent_video.py                                   # scena sintetica normala
     python ml/src/agent_video.py --scenariu obturare --dupa 15     # obiectiv acoperit dupa 15 s
     python ml/src/agent_video.py --sursa camera --model ml/models/video_camera.joblib
+
+Agentul publica si cadrele analizate ca flux MJPEG: http://127.0.0.1:8002/flux.mjpg
 """
 
 import argparse
@@ -21,6 +23,7 @@ import urllib.request
 from datetime import datetime, timezone
 
 from caracteristici_video import RezultatCaracteristici, calculeaza_caracteristici
+from flux_video import PublicatorCadre, porneste_server
 from model_video import CALE_MODEL_IMPLICIT, DetectorVideo
 from sursa_video import MODURI_SINTETICE, EroareSursaVideo, SursaCamera, SursaSintetica
 
@@ -67,12 +70,20 @@ def main():
     parser.add_argument("--model", default=CALE_MODEL_IMPLICIT)
     parser.add_argument("--soc", default="http://127.0.0.1:8000")
     parser.add_argument("--token", default="gatewatch-admin")
+    parser.add_argument("--port-flux", type=int, default=8002,
+                        help="port pentru fluxul MJPEG (http://127.0.0.1:PORT/flux.mjpg); 0 = dezactivat")
     args = parser.parse_args()
 
     detector = DetectorVideo(args.model)
     sursa = SursaSintetica() if args.sursa == "sintetica" else SursaCamera(args.camera)
     eticheta_sursa = "synthetic" if args.sursa == "sintetica" else "camera"
     print(f"agent video {args.id_camera}: sursa {args.sursa}, model {detector.versiune}, prag {detector.prag:.3f}")
+
+    publicator = None
+    if args.port_flux:
+        publicator = PublicatorCadre()
+        porneste_server(publicator, args.port_flux)
+        print(f"flux video: http://127.0.0.1:{args.port_flux}/flux.mjpg")
 
     start = time.monotonic()
     ultima_trimitere = 0.0
@@ -83,6 +94,8 @@ def main():
             cadru = sursa.citeste(mod)
             rezultat = calculeaza_caracteristici(cadru, anterior)
             anterior = cadru
+            if publicator:
+                publicator.publica(cadru)
             evaluare = detector.evalueaza(rezultat)
             if evaluare is not None and time.monotonic() - ultima_trimitere >= 1.0:
                 ultima_trimitere = time.monotonic()

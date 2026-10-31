@@ -9,6 +9,7 @@ from typing import Any, Literal, Optional
 
 from fastapi import FastAPI, Header, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
 from .config import Settings, settings as default_settings
@@ -19,6 +20,7 @@ from .mitre import mitre
 from .ml.detector import AnomalyDetector
 from .models import now_iso
 from .pipeline import Pipeline
+from .report import build_report, render_html
 from .rules import SEVERITY_RANK
 from .video import VideoMonitor, VideoTelemetry
 
@@ -151,6 +153,16 @@ def create_app(config: Settings = default_settings, client: Optional[SimulatorCl
             sql += " AND device_id = ?"
             params.append(device_id)
         return [alert_view(a) for a in db.query(sql + " ORDER BY updated_at DESC LIMIT ?", params + [limit])]
+
+    @app.get("/api/report")
+    def report(format: Literal["json", "html"] = "json"):
+        rule_names = {r["rule_id"]: r["name"] for r in pipeline.rules.catalog()}
+        data = build_report(db, device_rows(), rule_names)
+        if format == "json":
+            return data
+        stamp = data["generated_at"][:19].replace(":", "-").replace("T", "-")
+        return HTMLResponse(render_html(data), headers={
+            "Content-Disposition": f'attachment; filename="gatewatch-raport-{stamp}.html"'})
 
     @app.get("/api/incidents")
     def incidents():

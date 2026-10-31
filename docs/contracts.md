@@ -97,6 +97,7 @@ Attacker internal IP after VPN: `10.20.0.250`.
 - `GET  /api/incidents/{id}` → incident + `alerts` + `timeline` (events) + `actions`
 - `PATCH /api/incidents/{id}` body `{status}`
 - `POST /api/incidents/{id}/actions` body `{action: "isolate_device", device_id}` → calls simulator isolate
+- `GET  /api/report` → activity report built from current SOC data: `{generated_at, period, summary, totals, severity_counts, incidents_by_status, alerts_by_rule, techniques, incidents: [{…, alerts, actions}], devices_at_risk}`; `?format=html` returns the same report as a printable HTML download
 - `POST /api/reset` → clear SOC state (alerts/incidents/events); ingestion follows simulator's current run
 
 ## 6. Video telemetry (video module → SOC)

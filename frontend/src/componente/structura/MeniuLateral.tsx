@@ -2,7 +2,6 @@ export type IdPagina =
   | 'panou'
   | 'camere'
   | 'incidente'
-  | 'retea'
   | 'rapoarte'
 
 type ElementNavigare = {
@@ -20,7 +19,6 @@ const ELEMENTE_NAVIGARE: ElementNavigare[] = [
   { id: 'panou', eticheta: 'Panou principal', descriere: 'Vedere de ansamblu' },
   { id: 'camere', eticheta: 'Camere', descriere: 'Supraveghere video' },
   { id: 'incidente', eticheta: 'Incidente', descriere: 'Alerte și evenimente' },
-  { id: 'retea', eticheta: 'Rețea', descriere: 'Infrastructură conectată' },
   { id: 'rapoarte', eticheta: 'Rapoarte', descriere: 'Analiză și export' },
 ]
 
@@ -61,16 +59,6 @@ function IconitaPagina({ pagina }: { pagina: IdPagina }) {
           <path d="M12 3 2.5 20h19L12 3Z" />
           <path d="M12 9v5" />
           <path d="M12 17h.01" />
-        </svg>
-      )
-    case 'retea':
-      return (
-        <svg {...proprietatiComune}>
-          <circle cx="5" cy="12" r="2.5" />
-          <circle cx="19" cy="6" r="2.5" />
-          <circle cx="19" cy="18" r="2.5" />
-          <path d="M7.5 11 16.5 7" />
-          <path d="m7.5 13 9 4" />
         </svg>
       )
     case 'rapoarte':

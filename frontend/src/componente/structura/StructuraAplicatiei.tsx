@@ -2,10 +2,10 @@ import { useMemo, useState } from 'react'
 import { ScenaAeroport } from '../aeroport/ScenaAeroport'
 import { PaginaCamere } from '../camere/PaginaCamere'
 import { PanouStareCamera } from '../camere/PanouStareCamera'
+import { EvenimenteRecente } from '../comune/EvenimenteRecente'
 import { IndicatoriSoc } from '../comune/IndicatoriSoc'
 import { PaginaIncidente } from '../incidente/PaginaIncidente'
 import { PaginaRapoarte } from '../rapoarte/PaginaRapoarte'
-import { PaginaRetea } from '../retea/PaginaRetea'
 import { useCameraDemonstrativa } from '../../carlige/useCameraDemonstrativa'
 import { useDateSoc, type DateSoc } from '../../carlige/useDateSoc'
 import { IDENTIFICATOR_CAMERA_DEMONSTRATIVA } from '../../dateSimulate/cameraSimulata'
@@ -69,7 +69,7 @@ function PanouPrincipal({ soc }: { soc: DateSoc }) {
           </span>
         </div>
 
-        <ScenaAeroport stareCamera={camera} />
+        <ScenaAeroport stareCamera={camera} dispozitiveSoc={soc.conectat ? soc.dispozitive : []} />
       </div>
 
       <PanouStareCamera
@@ -78,6 +78,8 @@ function PanouPrincipal({ soc }: { soc: DateSoc }) {
         onSchimbaScenariu={seteazaScenariu}
         onRevinoLaNormal={revinoLaNormal}
       />
+
+      {soc.conectat && <EvenimenteRecente soc={soc} />}
     </section>
   )
 }
@@ -90,8 +92,6 @@ function ContinutPagina({ pagina, soc }: { pagina: IdPagina; soc: DateSoc }) {
       return <PaginaCamere soc={soc} />
     case 'incidente':
       return <PaginaIncidente soc={soc} />
-    case 'retea':
-      return <PaginaRetea soc={soc} />
     case 'rapoarte':
       return <PaginaRapoarte soc={soc} />
   }

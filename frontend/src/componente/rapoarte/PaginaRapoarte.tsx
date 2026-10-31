@@ -7,42 +7,13 @@ import {
   STARI_INCIDENT,
   formateazaNumarIntreg,
 } from '../../servicii/formatare'
-import type { AlertaSoc } from '../../tipuri/soc'
 import {
   AntetPagina,
   Card,
   Insigna,
   MesajSocIndisponibil,
-  StareGoala,
 } from '../comune/ElementeSoc'
-
-type RandTehnica = {
-  id: string
-  denumire: string
-  tactica: string
-  numar: number
-}
-
-function tehniciObservate(alerte: AlertaSoc[]): RandTehnica[] {
-  const tehnici = new Map<string, RandTehnica>()
-  for (const alerta of alerte) {
-    if (!alerta.mitre) {
-      continue
-    }
-    const existenta = tehnici.get(alerta.mitre.technique_id)
-    if (existenta) {
-      existenta.numar += 1
-    } else {
-      tehnici.set(alerta.mitre.technique_id, {
-        id: alerta.mitre.technique_id,
-        denumire: alerta.mitre.technique,
-        tactica: alerta.mitre.tactic,
-        numar: 1,
-      })
-    }
-  }
-  return [...tehnici.values()].sort((a, b) => b.numar - a.numar)
-}
+import { RaportGenerat } from './RaportGenerat'
 
 function exportaJson(soc: DateSoc) {
   const continut = {
@@ -76,7 +47,6 @@ function TabelNumarare({ randuri }: { randuri: { cheie: string; eticheta: ReactN
 }
 
 export function PaginaRapoarte({ soc }: { soc: DateSoc }) {
-  const tehnici = tehniciObservate(soc.alerte)
   const alerteReguli = soc.alerte.filter((alerta) => alerta.source === 'rule').length
   const alerteMl = soc.alerte.filter((alerta) => alerta.source === 'ml').length
 
@@ -86,7 +56,7 @@ export function PaginaRapoarte({ soc }: { soc: DateSoc }) {
         id="titlu-rapoarte"
         eticheta="Secțiune"
         titlu="Rapoarte"
-        subtitlu="Sinteza detecțiilor SOC: severități, surse de detecție, starea incidentelor și tehnici MITRE ATT&CK observate."
+        subtitlu="Sinteza detecțiilor SOC: incidente, alerte detectate, severități și surse de detecție."
       />
 
       {!soc.conectat && !soc.seIncarca ? (
@@ -107,6 +77,8 @@ export function PaginaRapoarte({ soc }: { soc: DateSoc }) {
               {formateazaNumarIntreg(soc.alerte.length)} alerte
             </span>
           </div>
+
+          <RaportGenerat conectat={soc.conectat} />
 
           <div className="grila-rapoarte">
             <Card titlu="Alerte deschise pe severitate">
@@ -139,34 +111,6 @@ export function PaginaRapoarte({ soc }: { soc: DateSoc }) {
             </Card>
           </div>
 
-          <Card titlu="Tehnici MITRE ATT&CK observate">
-            {tehnici.length === 0 ? (
-              <StareGoala mesaj="Nu au fost observate tehnici MITRE ATT&CK." />
-            ) : (
-              <div className="tabel-container">
-                <table className="tabel tabel--compact">
-                  <thead>
-                    <tr>
-                      <th scope="col">Tehnică</th>
-                      <th scope="col">Denumire</th>
-                      <th scope="col">Tactică</th>
-                      <th scope="col">Alerte</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tehnici.map((tehnica) => (
-                      <tr key={tehnica.id}>
-                        <td className="tabel__monospatiat">{tehnica.id}</td>
-                        <td>{tehnica.denumire}</td>
-                        <td>{tehnica.tactica}</td>
-                        <td className="tabel__numar">{tehnica.numar}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </Card>
         </>
       )}
     </section>

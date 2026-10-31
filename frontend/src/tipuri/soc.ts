@@ -142,3 +142,62 @@ export type DetaliiIncidentSoc = IncidentSoc & {
   timeline: EvenimentSoc[]
   actions: ActiuneIncident[]
 }
+
+/** Raportul de activitate generat de SOC (GET /api/report). */
+export type RaportSoc = {
+  generated_at: string
+  period: { first_event: string | null; last_event: string | null }
+  summary: string
+  totals: {
+    events: number
+    alerts: number
+    alerts_open: number
+    alerts_rule: number
+    alerts_ml: number
+    incidents: number
+    incidents_open: number
+    devices_at_risk: number
+  }
+  severity_counts: Record<SeveritateSoc, number>
+  incidents_by_status: Record<StareIncident, number>
+  alerts_by_rule: { rule_id: string; name: string; count: number }[]
+  techniques: { technique_id: string; technique?: string; tactic?: string; count: number }[]
+  incidents: IncidentRaport[]
+  devices_at_risk: {
+    device_id: string
+    name: string | null
+    zone: string | null
+    security_state: StareSecuritateSoc
+    operational_status: StareOperationalaSoc
+    open_alerts: number
+  }[]
+}
+
+export type IncidentRaport = {
+  incident_id: string
+  title: string
+  status: StareIncident
+  severity: SeveritateSoc
+  created_at: string
+  last_alert_at: string
+  devices: string[]
+  tactics: string[]
+  summary: string
+  alerts: {
+    alert_id: string
+    created_at: string
+    rule_id: string
+    severity: SeveritateSoc
+    device_id: string
+    title: string
+    description: string
+    technique_id: string | null
+  }[]
+  actions: {
+    created_at: string
+    action: string
+    device_id: string | null
+    result: string
+    detail: string | null
+  }[]
+}

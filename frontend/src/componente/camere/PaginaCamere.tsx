@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { DateSoc } from '../../carlige/useDateSoc'
 import {
   ETICHETE_ZONE,
@@ -13,9 +14,14 @@ import {
   MesajSocIndisponibil,
   StareGoala,
 } from '../comune/ElementeSoc'
+import { FluxCamera } from './FluxCamera'
+
+/** Singura cameră cu flux video în demonstrație. */
+const CAMERA_CU_FLUX = 'CAM-01'
 
 export function PaginaCamere({ soc }: { soc: DateSoc }) {
   const camere = soc.dispozitive.filter((dispozitiv) => dispozitiv.type === 'camera')
+  const [fluxDeschis, setFluxDeschis] = useState(false)
 
   return (
     <section className="pagina" aria-labelledby="titlu-camere">
@@ -25,6 +31,8 @@ export function PaginaCamere({ soc }: { soc: DateSoc }) {
         titlu="Camere"
         subtitlu="Starea operațională și starea de securitate a camerelor de supraveghere, raportate de SOC."
       />
+
+      <FluxCamera identificator={CAMERA_CU_FLUX} deschis={fluxDeschis} onSchimba={setFluxDeschis} />
 
       {!soc.conectat && !soc.seIncarca ? (
         <MesajSocIndisponibil eroare={soc.eroare} />
@@ -48,7 +56,12 @@ export function PaginaCamere({ soc }: { soc: DateSoc }) {
                 </thead>
                 <tbody>
                   {camere.map((camera) => (
-                    <tr key={camera.device_id}>
+                    <tr
+                      key={camera.device_id}
+                      className={camera.device_id === CAMERA_CU_FLUX ? 'tabel__rand--actionabil' : undefined}
+                      onClick={camera.device_id === CAMERA_CU_FLUX ? () => setFluxDeschis(true) : undefined}
+                      title={camera.device_id === CAMERA_CU_FLUX ? 'Deschide fluxul video' : undefined}
+                    >
                       <td>
                         <strong>{camera.device_id}</strong>
                         <span className="tabel__secundar">{camera.name}</span>

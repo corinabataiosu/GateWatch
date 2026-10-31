@@ -114,3 +114,21 @@ class TesteTelemetrie(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TesteFluxVideo(unittest.TestCase):
+    def test_serverul_publica_ultimul_cadru_jpeg(self):
+        import urllib.request
+
+        from flux_video import PublicatorCadre, porneste_server
+
+        publicator = PublicatorCadre()
+        server = porneste_server(publicator, 0)  # port liber ales de sistem
+        try:
+            port = server.server_address[1]
+            publicator.publica(SursaSintetica(seed=2).citeste())
+            with urllib.request.urlopen(f"http://127.0.0.1:{port}/cadru.jpg", timeout=3) as raspuns:
+                self.assertEqual(raspuns.headers["Content-Type"], "image/jpeg")
+                self.assertEqual(raspuns.read(2), b"\xff\xd8")  # antet JPEG
+        finally:
+            server.shutdown()

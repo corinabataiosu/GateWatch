@@ -8,7 +8,6 @@ import {
   formateazaNumarIntreg,
 } from '../../servicii/formatare'
 import {
-  AntetPagina,
   Card,
   Insigna,
   MesajSocIndisponibil,

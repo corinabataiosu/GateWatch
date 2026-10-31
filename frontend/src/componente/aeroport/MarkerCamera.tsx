@@ -151,7 +151,7 @@ export function MarkerCamera({
         style={{ pointerEvents: 'none' }}
       >
         <span
-          className={`marker-camera__eticheta${selectat ? ' marker-camera__eticheta--activ' : ''}`}
+          className={`marker-camera__eticheta marker-camera__eticheta--${scenariuActiv}${selectat ? ' marker-camera__eticheta--activ' : ''}`}
         >
           {identificator}
         </span>

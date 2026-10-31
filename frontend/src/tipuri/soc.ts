@@ -50,6 +50,26 @@ export type DispozitivSoc = {
   last_seen: string | null
   /** Ultimul scor Isolation Forest calculat de SOC pe evenimentele dispozitivului. */
   ml: ScorMlSoc | null
+  /** Ultima telemetrie a modulului video (ml/src/agent_video.py), dacă rulează pentru dispozitiv. */
+  video: TelemetrieVideoSoc | null
+}
+
+export type TelemetrieVideoSoc = {
+  captured_at: string
+  /** Luminozitate medie, 0-255. */
+  brightness: number
+  /** Varianța Laplacianului (fără limită superioară). */
+  sharpness: number
+  /** Diferența medie față de cadrul anterior, 0-255. */
+  frame_diff: number | null
+  score: number
+  threshold: number
+  is_anomaly: boolean
+  out_of_range: string[]
+  model_version: string | null
+  source: 'camera' | 'synthetic'
+  stale: boolean
+  diagnosis: string | null
 }
 
 export type ScorMlSoc = {

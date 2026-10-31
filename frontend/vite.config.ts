@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     // În dezvoltare, apelurile /api sunt redirecționate către backend-ul SOC.
     proxy: {
-      '/api': 'http://localhost:8000',
+      '/api': 'http://127.0.0.1:8000',
     },
   },
 })

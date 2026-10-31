@@ -257,7 +257,7 @@ export function PanouStareCamera({
         <span>Rezultat analiză:</span> {camera.detectieAnomalii.descriere}
       </p>
 
-      {!modSoc && (
+      {(!modSoc || camera.luminozitate !== null) && (
         <section
           className="panou-stare-camera__sectiune"
           aria-labelledby="titlu-metrici-camera"
@@ -269,7 +269,10 @@ export function PanouStareCamera({
             Metrici vizuale
           </h3>
 
-          <dl className="metrici-camera" aria-label="Metrici vizuale simulate">
+          <dl
+            className="metrici-camera"
+            aria-label={modSoc ? 'Metrici vizuale raportate de modulul video' : 'Metrici vizuale simulate'}
+          >
             <div className="metrici-camera__element">
               <dt className="metrici-camera__eticheta">Luminozitate</dt>
               <dd
@@ -391,9 +394,11 @@ export function PanouStareCamera({
       </section>
 
       <p className="panou-stare-camera__nota">
-        {modSoc
-          ? 'Starea de securitate și alertele sunt calculate de SOC pe baza evenimentelor din simulatorul de infrastructură.'
-          : 'Datele afișate sunt simulate exclusiv pentru demonstrație și nu reprezintă măsurători reale.'}
+        {!modSoc
+          ? 'Datele afișate sunt simulate exclusiv pentru demonstrație și nu reprezintă măsurători reale.'
+          : camera.luminozitate !== null
+            ? 'Starea de securitate și alertele sunt calculate de SOC pe baza evenimentelor din simulatorul de infrastructură și a imaginii analizate de modulul video.'
+            : 'Starea de securitate și alertele sunt calculate de SOC pe baza evenimentelor din simulatorul de infrastructură.'}
       </p>
     </section>
   )

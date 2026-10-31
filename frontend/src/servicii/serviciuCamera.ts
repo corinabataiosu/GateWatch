@@ -83,10 +83,27 @@ function stareSecuritateDinSoc(dispozitiv: DispozitivSoc): StareSecuritate {
   }
 }
 
+/** Regula SOC pentru anomaliile raportate de modulul video. */
+const REGULA_VIDEO = 'GW-V01'
+
+/** Convertește o valoare 0-255 la scala 0-100 folosită de panou. */
+function laScara100(valoare: number): number {
+  return Math.round((valoare / 2.55) * 10) / 10
+}
+
+/**
+ * Claritatea este varianța Laplacianului, fără limită superioară. Panoul afișează abaterea
+ * standard a Laplacianului (rădăcina varianței), limitată la 100: o imagine clară de
+ * supraveghere are de obicei 20-40, o imagine neclară sub 10.
+ */
+function claritatePeScara100(variantaLaplacian: number): number {
+  return Math.min(100, Math.round(Math.sqrt(variantaLaplacian) * 10) / 10)
+}
+
 /**
  * Construiește starea camerei pe baza datelor SOC.
- * SOC este autoritar pentru starea de securitate; metricile vizuale nu sunt furnizate
- * de SOC, așa că rămân indisponibile în loc să fie inventate.
+ * SOC este autoritar pentru starea de securitate. Metricile vizuale provin din modulul
+ * video (prin SOC); fără telemetrie video recentă rămân indisponibile în loc să fie inventate.
  */
 export function construiesteCameraDinSoc(
   dispozitiv: DispozitivSoc,
@@ -95,8 +112,13 @@ export function construiesteCameraDinSoc(
   const alerteDeschise = alerteSoc
     .filter((alerta) => alerta.device_id === dispozitiv.device_id && alerta.status === 'open')
     .sort((a, b) => b.created_at.localeCompare(a.created_at))
-  const alertaMl = alerteDeschise.find((alerta) => alerta.source === 'ml')
+  const alertaMl = alerteDeschise.find(
+    (alerta) => alerta.source === 'ml' && alerta.rule_id !== REGULA_VIDEO,
+  )
   const conectata = dispozitiv.operational_status === 'online'
+  // Telemetria video este folosită doar cât timp este recentă și dispozitivul este online.
+  const video = conectata && dispozitiv.video && !dispozitiv.video.stale ? dispozitiv.video : null
+  const videoOprit = conectata && dispozitiv.video !== null && dispozitiv.video.stale
 
   const alerte: AlertaCamera[] = alerteDeschise.map((alerta) => ({
     identificator: identificatorAlerta(alerta.alert_id),
@@ -111,7 +133,17 @@ export function construiesteCameraDinSoc(
   }))
 
   let descriere: string
-  if (!conectata) {
+  if (video) {
+    descriere = video.is_anomaly
+      ? `Modulul video a semnalat o imagine atipică: ${video.diagnosis ?? 'caracteristici vizuale neobișnuite'}.`
+      : 'Modulul video nu a semnalat anomalii în imagine.'
+    if (alertaMl) {
+      descriere += ` Evenimente: ${alertaMl.description}`
+    }
+  } else if (videoOprit) {
+    // Lipsa telemetriei video nu este interpretată ca atac; doar raportată.
+    descriere = 'Modulul video nu mai trimite date; analiza imaginii este indisponibilă.'
+  } else if (!conectata) {
     descriere =
       dispozitiv.operational_status === 'isolated'
         ? 'Dispozitivul este izolat de SOC; analiza evenimentelor este suspendată.'
@@ -128,19 +160,31 @@ export function construiesteCameraDinSoc(
     scenariu: scenariuDinSoc(dispozitiv),
     sursaDate: 'soc',
     stareConexiune: conectata ? 'conectata' : 'deconectata',
-    disponibilitateFluxVideo: conectata ? 'disponibil' : 'intrerupt',
+    disponibilitateFluxVideo: !conectata || videoOprit
+      ? 'intrerupt'
+      : video?.is_anomaly
+        ? 'degradat'
+        : 'disponibil',
     stareSecuritate: stareSecuritateDinSoc(dispozitiv),
     ultimaActualizare: dispozitiv.last_seen ?? new Date().toISOString(),
-    luminozitate: null,
-    claritate: null,
-    diferentaIntreCadre: null,
-    detectieAnomalii: {
-      disponibil: conectata,
-      esteAnomalie: Boolean(alertaMl),
-      scor: dispozitiv.ml?.score ?? alertaMl?.score ?? null,
-      prag: dispozitiv.ml?.threshold ?? 0,
-      descriere,
-    },
+    luminozitate: video ? laScara100(video.brightness) : null,
+    claritate: video ? claritatePeScara100(video.sharpness) : null,
+    diferentaIntreCadre: video?.frame_diff != null ? laScara100(video.frame_diff) : null,
+    detectieAnomalii: video
+      ? {
+          disponibil: true,
+          esteAnomalie: video.is_anomaly,
+          scor: video.score,
+          prag: video.threshold,
+          descriere,
+        }
+      : {
+          disponibil: conectata && !videoOprit,
+          esteAnomalie: Boolean(alertaMl),
+          scor: dispozitiv.ml?.score ?? alertaMl?.score ?? null,
+          prag: dispozitiv.ml?.threshold ?? 0,
+          descriere,
+        },
     alerte,
   }
 }

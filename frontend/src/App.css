@@ -426,6 +426,19 @@
   background-color: #eef5fb;
 }
 
+/* Eticheta preia culoarea stării, ca markerul să rămână lizibil și când eticheta îl acoperă. */
+.marker-camera__eticheta--avertizare {
+  border-color: rgba(176, 74, 63, 0.7);
+  background-color: #fdf1ef;
+  color: #8f3831;
+}
+
+.marker-camera__eticheta--offline {
+  border-color: rgba(107, 119, 135, 0.6);
+  background-color: #f1f3f6;
+  color: #6b7787;
+}
+
 .marker-camera__panou {
   position: absolute;
   top: 14px;

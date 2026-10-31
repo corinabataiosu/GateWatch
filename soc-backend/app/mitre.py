@@ -1,6 +1,9 @@
 """MITRE ATT&CK techniques referenced by GateWatch detections."""
 
 TECHNIQUES: dict[str, dict[str, str]] = {
+    "T1498": {"technique": "Network Denial of Service", "tactic": "Impact"},
+    "T1021": {"technique": "Remote Services", "tactic": "Lateral Movement"},
+    "T1041": {"technique": "Exfiltration Over C2 Channel", "tactic": "Exfiltration"},
     "T1133": {"technique": "External Remote Services", "tactic": "Initial Access"},
     "T1046": {"technique": "Network Service Discovery", "tactic": "Discovery"},
     "T1110": {"technique": "Brute Force", "tactic": "Credential Access"},
@@ -13,7 +16,7 @@ TECHNIQUES: dict[str, dict[str, str]] = {
 # Order used to describe the attack progression in incident summaries.
 TACTIC_ORDER = [
     "Initial Access", "Discovery", "Credential Access", "Persistence",
-    "Defense Evasion", "Collection", "Exfiltration", "Impact",
+    "Defense Evasion", "Lateral Movement", "Collection", "Exfiltration", "Impact",
 ]
 
 

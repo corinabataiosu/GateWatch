@@ -104,9 +104,13 @@ def render_html(report: dict[str, Any]) -> str:
 
     incidents_html = []
     for inc in report["incidents"]:
-        alerts = "".join(
-            f"<tr>{rows([_fmt(a['created_at']), escape(a['alert_id']), escape(a['rule_id']), escape(SEVERITY_LABELS[a['severity']]), escape(a['device_id']), escape(a['title']) + '<br><span class="meta">' + escape(a['description']) + '</span>', escape(a['technique_id'] or '—')])}</tr>"
-            for a in inc["alerts"])
+        alert_rows = []
+        for a in inc["alerts"]:
+            title = f"{escape(a['title'])}<br><span class=\"meta\">{escape(a['description'])}</span>"
+            alert_rows.append(
+                f"<tr>{rows([_fmt(a['created_at']), escape(a['alert_id']), escape(a['rule_id']), escape(SEVERITY_LABELS[a['severity']]), escape(a['device_id']), title, escape(a['technique_id'] or '—')])}</tr>"
+            )
+        alerts = "".join(alert_rows)
         actions = "".join(
             f"<li>{_fmt(x['created_at'])} · {escape(ACTION_LABELS.get(x['action'], x['action']))}"
             f"{' · ' + escape(x['device_id']) if x['device_id'] else ''} · {escape(x['detail'] or x['result'])}</li>"

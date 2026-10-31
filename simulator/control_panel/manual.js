@@ -1,14 +1,38 @@
 // Independent manual controls; configuration never produces events.
 (() => {
   'use strict'
+  const etichete = {
+  "Failed to fetch": "Conexiunea cu serverul a eșuat",
+  "NetworkError when attempting to fetch resource.": "Conexiunea cu serverul a eșuat.",
+  "online": "Conectat",
+  "offline": "Deconectat",
+  "isolated": "Izolat",
+  "completed": "Finalizat",
+  "running": "În curs",
+  "failed": "Eșuat",
+  "camera": "Cameră",
+  "nvr": "Înregistrator video",
+  "access_control": "Control acces",
+  "iot_gateway": "Gateway IoT",
+  "vpn_gateway": "Gateway VPN",
+  "terminal": "Terminal",
+  "airside": "Platformă",
+  "perimeter": "Perimetru",
+  "operations": "Operațiuni",
+  "auth_login": "Autentificare",
+  "connection_attempt": "Încercare de conectare",
+  "access_denied": "Acces refuzat",
+  "network_flow": "Flux de rețea"
+}
+  const tr = value => etichete[value] || value
   const $ = (id) => document.getElementById(id)
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`)
-  let devices = [], catalog = [], signature = '', busy = false, requestId = null, executionError = false, nextAllowed = 0, initialized = false
+  let devices = [], catalog = [], signature = '', busy = false, requestId = null, executionError = false, nextAllowed = 0
   const form = $('attack-form'), button = $('execute-attack')
   const numeric = id => Number($(id).value)
   async function get(path) {
     const response = await fetch(path)
-    if (!response.ok) throw new Error(`Server returned ${response.status}`)
+    if (!response.ok) throw new Error(`Serverul a returnat codul ${response.status}`)
     return response.json()
   }
   function selected() { return devices.find(d => d.device_id === $('device-select').value) }
@@ -23,45 +47,40 @@
     show('field-direction', flood); show('field-external', !lateral); show('field-destination', lateral)
     show('field-count', !flood && !exfil); show('field-pps', flood); show('field-bps', exfil)
     show('field-port', flood || lateral || exfil)
-    $('external-label').textContent = outbound ? 'Fictional external destination IP' : 'Simulated external source IP'
-    $('count-label').textContent = attack === 'port_scan' ? 'Distinct virtual ports' : 'Requests / attempts'
+    $('external-label').textContent = outbound ? 'IP extern fictiv de destinație' : 'Sursă IP externă'
+    $('count-label').textContent = attack === 'port_scan' ? 'Porturi virtuale distincte' : 'Cereri'
     $('attack-description').textContent = catalog.find(a => a.id === attack)?.description || ''
-    $('device-summary').innerHTML = d ? [['Device',d.device_id],['Type',d.type],['Virtual IP',d.ip],['Zone',d.zone],['Status',d.status]].map(([k,v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('') : ''
+    $('device-summary').innerHTML = d ? [['Dispozitiv',d.device_id],['Tip',tr(d.type)],['IP virtual',d.ip],['Zonă',tr(d.zone)],['Stare',tr(d.status)]].map(([k,v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('') : ''
     const incompatible = exfil && d?.type === 'access_control'
     const target = devices.find(d => d.device_id === $('attack-destination').value)
     const port = numeric('attack-port') || (target?.type === 'camera' ? 80 : target?.type === 'iot_gateway' ? 8883 : 443)
     const allowed = lateral && d && target && (d.type === 'camera' && target.type === 'nvr' && [443,554].includes(port) || d.type === 'iot_gateway' && port === 8883 || d.type === 'vpn_gateway' && target.type === 'iot_gateway' && port === 443)
-    const error = !d ? 'Select a device.' : d.status !== 'online' ? 'This device is not online. Restore it or select another device.' : incompatible ? 'Access controllers do not support the bulk-data demo profile.' : lateral && (!target || target.device_id === d.device_id || target.status !== 'online') ? 'Choose a different online destination device.' : allowed ? 'This link is permitted by the virtual network policy. Choose a forbidden destination or port.' : ''
+    const error = !d ? 'Selectează un dispozitiv.' : d.status !== 'online' ? 'Dispozitivul nu este online. Restabilește-l sau selectează un alt dispozitiv.' : incompatible ? 'Controlerele de acces nu suportă profilul demo de transfer de date în masă.' : lateral && (!target || target.device_id === d.device_id || target.status !== 'online') ? 'Alege un alt dispozitiv de destinație online.' : allowed ? 'Această legătură este permisă de politicile de rețea virtuală. Alege o destinație sau un port interzis.' : ''
     $('attack-validation').textContent = error
     button.disabled = busy || Date.now() < nextAllowed || Boolean(error) || !catalog.length
     const src = outbound ? d?.ip : $('attack-external').value
     const dst = lateral ? target?.ip : outbound ? $('attack-external').value : d?.ip
-    $('attack-preview').textContent = `${src || '—'} → ${dst || '—'} · ${flood ? (numeric('attack-pps') * numeric('attack-duration')).toLocaleString() + ' virtual packets' : exfil ? (numeric('attack-bps') * numeric('attack-duration') / 1000000).toFixed(1) + ' MB virtual transfer' : numeric('attack-count') + ' observations'}`
+    $('attack-preview').textContent = `${src || '—'} → ${dst || '—'} · ${flood ? (numeric('attack-pps') * numeric('attack-duration')).toLocaleString() + ' pachete virtuale' : exfil ? (numeric('attack-bps') * numeric('attack-duration') / 1000000).toFixed(1) + ' MB transfer virtual' : numeric('attack-count') + ' observații'}`
     document.querySelectorAll('[data-device]').forEach(el => el.classList.toggle('dispozitiv--selected', el.dataset.device === d?.device_id))
   }
   function renderResults(results) {
     $('execution-results').innerHTML = results.length ? results.map(r => {
       const attack = catalog.find(a => a.id === r.attack)?.name || r.attack
-      const fields = [['Device',r.device_id],['Source → destination',`${r.source_ip} → ${r.destination_ip}`],['Started',r.started_at],['Completed',r.completed_at || '—'],['Virtual duration',`${r.virtual_duration_s || '—'} seconds`],['Observations',r.event_count],['Virtual packets / requests',r.packet_count],['Virtual traffic',`${Number(r.total_bytes).toLocaleString()} bytes`]]
-      return `<article class="execution"><div class="card__antet"><strong>${esc(attack)}</strong><span class="insigna ${r.status === 'completed' ? 'insigna--buna' : 'insigna--alerta'}">${esc(r.status)}</span></div><p class="execution-id">${esc(r.execution_id)}</p><dl class="campuri">${fields.map(([k,v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl><p class="hint">${esc(Object.entries(r.summary).map(([k,v]) => `${k}: ${v}`).join(' · '))}</p>${r.errors.map(e => `<p class="mesaj--eroare">${esc(e)}</p>`).join('')}<p class="hint">Simulator execution only. Review independent detections in the SOC dashboard.</p></article>`
-    }).join('') : '<p class="hint">No manual executions in this run.</p>'
+      const fields = [['Dispozitiv',r.device_id],['Sursă → destinație',`${r.source_ip} → ${r.destination_ip}`],['Început',r.started_at],['Finalizat',r.completed_at || '—'],['Durată virtuală',`${r.virtual_duration_s || '—'} secunde`],['Observații',r.event_count],['Pachete / cereri virtuale',r.packet_count],['Trafic virtual',`${Number(r.total_bytes).toLocaleString()} octeți`]]
+      return `<article class="execution"><div class="card__antet"><strong>${esc(attack)}</strong><span class="insigna ${r.status === 'completed' ? 'insigna--buna' : 'insigna--alerta'}">${esc(tr(r.status))}</span></div><p class="execution-id">${esc(r.execution_id)}</p><dl class="campuri">${fields.map(([k,v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl><p class="hint">${esc(Object.entries(r.summary).map(([k,v]) => `${tr(k)}: ${v}`).join(' · '))}</p>${r.errors.map(e => `<p class="mesaj--eroare">${esc(e)}</p>`).join('')}<p class="hint">Rezultatul execuției în simulator. Consultă detecțiile independente în panoul SOC.</p></article>`
+    }).join('') : '<p class="hint">Nu există execuții manuale în această rulare.</p>'
   }
   async function refresh() {
     const [inventory, executions, health] = await Promise.all([get('/sim/devices'), get('/sim/executions'), get('/sim/health')])
-    $('baseline-status').textContent = health.baseline.enabled ? 'Baseline active' : 'Baseline paused'
-    if (!initialized) {
-      $('baseline-activ').checked = health.baseline.enabled
-      $('baseline-rata').value = health.baseline.rate
-      initialized = true
-    }
+    $('baseline-status').textContent = health.baseline.enabled ? 'Trafic de bază activ' : 'Trafic de bază oprit'
     devices = inventory
     const next = JSON.stringify(devices.map(({device_id,status}) => [device_id,status]))
     if (next !== signature) {
       signature = next
-      const options = devices.map(d => `<option value="${esc(d.device_id)}">${esc(d.device_id)} · ${esc(d.ip)} · ${esc(d.status)}</option>`).join('')
+      const options = devices.map(d => `<option value="${esc(d.device_id)}">${esc(d.device_id)} · ${esc(d.ip)} · ${esc(tr(d.status))}</option>`).join('')
       for (const id of ['device-select','attack-destination','event-device']) {
         const prior = $(id).value
-        $(id).innerHTML = (id === 'event-device' ? '<option value="">All devices</option>' : '<option value="">Select a device…</option>') + (id === 'device-select' ? [...new Set(devices.map(d => d.zone))].map(zone => `<optgroup label="${esc(zone)}">${devices.filter(d => d.zone === zone).map(d => `<option value="${esc(d.device_id)}">${esc(d.device_id)} · ${esc(d.ip)}</option>`).join('')}</optgroup>`).join('') : options)
+        $(id).innerHTML = (id === 'event-device' ? '<option value="">Toate dispozitivele</option>' : '<option value="">Selectează un dispozitiv…</option>') + (id === 'device-select' ? [...new Set(devices.map(d => d.zone))].map(zone => `<optgroup label="${esc(tr(zone))}">${devices.filter(d => d.zone === zone).map(d => `<option value="${esc(d.device_id)}">${esc(d.device_id)} · ${esc(d.ip)}</option>`).join('')}</optgroup>`).join('') : options)
         $(id).value = prior
       }
     }
@@ -89,20 +108,21 @@
     if (!['dos','exfiltration'].includes(attack)) body.count = numeric('attack-count')
     if (!$('attack-port').disabled && $('attack-port').value) body.port = numeric('attack-port')
     form.querySelectorAll('input,select').forEach(el => { el.disabled = true })
-    button.disabled = true; button.textContent = 'Executing…'
-    $('execution-results').textContent = 'Generating and persisting virtual observations…'
+    button.disabled = true; button.textContent = 'Se execută…'
+    $('execution-results').textContent = 'Generating and persisting virtual observații…'
     try {
-      const response = await fetch('/sim/attacks/execute', {method:'POST',headers:{'Content-Type':'application/json','X-Admin-Token':$('token').value},body:JSON.stringify(body)})
+      const adminToken = localStorage.getItem('gatewatch-admin-token') || 'gatewatch-admin'
+      const response = await fetch('/sim/attacks/execute', {method:'POST',headers:{'Content-Type':'application/json','X-Admin-Token':adminToken},body:JSON.stringify(body)})
       const result = await response.json()
-      if (!response.ok) throw new Error(typeof result.detail === 'string' ? result.detail : JSON.stringify(result.detail))
+      if (!response.ok) throw new Error(typeof result.detail === 'string' ? tr(result.detail) : 'Parametrii nu sunt valizi. Verifică adresa IP fictivă și limitele câmpurilor numerice.')
       renderResults([result]); requestId = null
     } catch (error) {
       executionError = true
-      $('execution-results').textContent = `Execution error: ${error.message}. If the connection failed, retry unchanged settings to recover the same execution ID.`
+      $('execution-results').textContent = `Eroare la execuție: ${tr(error.message)}. Dacă s-a întrerupt conexiunea, reîncearcă fără să modifici setările pentru a recupera aceeași execuție.`
     } finally {
       busy = false
       form.querySelectorAll('input,select').forEach(el => { el.disabled = false })
-      button.textContent = 'Execute Attack'; configure()
+      button.textContent = 'Execută atac'; configure()
       setTimeout(configure, Math.max(0, nextAllowed - Date.now()))
     }
   })
@@ -113,7 +133,7 @@
         $('attack-select').innerHTML = catalog.map(a => `<option value="${esc(a.id)}">${esc(a.name)}</option>`).join('')
       }
       if (!busy) await refresh()
-    } catch (error) { button.disabled = true; $('attack-validation').textContent = `Manual controls unavailable: ${error.message}` }
+    } catch (error) { button.disabled = true; $('attack-validation').textContent = `Comenzile manuale sunt indisponibile: ${error.message}` }
     setTimeout(loop, 1500)
   }
   loop()

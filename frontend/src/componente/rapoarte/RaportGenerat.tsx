@@ -58,11 +58,6 @@ export function RaportGenerat({ conectat }: { conectat: boolean }) {
         )}
       </div>
 
-      {stare.tip === 'inactiv' && (
-        <p className="raport__nota">
-          Raportul rezumă alertele și incidentele detectate de SOC până în acest moment.
-        </p>
-      )}
       {stare.tip === 'eroare' && (
         <p className="raport__eroare" role="alert">
           {stare.mesaj}

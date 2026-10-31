@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>GateWatch — Panou de control simulator</title>
+  <title>GateWatch - Panou de control simulator</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -12,111 +12,67 @@
       <span class="antet__logo">GW</span>
       <div>
         <h1 class="antet__titlu">GateWatch Simulator</h1>
-        <p class="antet__subtitlu">Infrastructură aeroportuară virtuală · 15 dispozitive · 4 zone</p>
       </div>
     </div>
     <div class="antet__stare">
-      <span id="baseline-status" class="insigna insigna--neutra">Baseline…</span>
+      <span id="baseline-status" class="insigna insigna--neutra">Trafic de bază…</span>
       <span id="indicator-conexiune" class="insigna insigna--neutra">Se conectează…</span>
     </div>
   </header>
 
   <main class="grila">
-    <section class="card card--rulare" aria-labelledby="t-rulare">
-      <h2 id="t-rulare" class="card__titlu">Rulare curentă</h2>
-      <dl class="campuri">
-        <div><dt>ID rulare</dt><dd id="run-id">—</dd></div>
-        <div><dt>Evenimente</dt><dd id="run-seq">0</dd></div>
-        <div><dt>Mod scenariu</dt><dd id="run-mode">—</dd></div>
-        <div><dt>Stare scenariu</dt><dd id="run-state">—</dd></div>
-      </dl>
-
-      <label class="camp-token">
-        <span>Token administrare</span>
-        <input id="token" type="password" autocomplete="off" placeholder="X-Admin-Token" />
-      </label>
-
-      <div class="actiuni">
-        <button id="btn-rulare-noua" class="buton">Rulare nouă</button>
-      </div>
-
-      <div class="baseline">
-        <label class="comutator">
-          <input id="baseline-activ" type="checkbox" checked />
-          <span>Trafic de bază (sintetic)</span>
-        </label>
-        <label class="rata">
-          <span>Rată</span>
-          <input id="baseline-rata" type="number" min="0.1" max="10" step="0.1" value="1" />
-        </label>
-        <button id="btn-baseline" class="buton buton--mic">Aplică</button>
-      </div>
-
-      <p id="mesaj" class="mesaj" role="status" aria-live="polite"></p>
-    </section>
-
-    <section class="card card--manual" aria-labelledby="t-manual">
-      <div class="card__antet"><h2 id="t-manual" class="card__titlu">Manual attack workstation</h2><span class="insigna insigna--neutra">Virtual only</span></div>
+<section class="card card--manual" aria-labelledby="t-manual">
+      <div class="card__antet"><h2 id="t-manual" class="card__titlu">Atac manual</h2><span class="insigna insigna--neutra">Exclusiv virtual</span></div>
       <form id="attack-form">
-        <label class="field"><span>1 · Select device</span><select id="device-select" required><option value="">Loading inventory…</option></select></label>
+        <label class="field"><span>1 · Selectează dispozitiv</span><select id="device-select" required><option value="">Încărcare inventar…</option></select></label>
         <dl id="device-summary" class="campuri device-summary"></dl>
-        <label class="field"><span>2 · Select attack</span><select id="attack-select" required></select></label>
+        <label class="field"><span>2 · Selectează atac</span><select id="attack-select" required></select></label>
         <p id="attack-description" class="hint"></p>
-        <fieldset id="attack-settings"><legend>3 · Configure virtual behavior</legend>
-          <label class="field" id="field-direction"><span>Traffic direction</span><select id="attack-direction"><option value="inbound">INBOUND · external → device</option><option value="outbound">OUTBOUND · device → external</option></select></label>
-          <label class="field" id="field-external"><span id="external-label">Simulated external source IP</span><input id="attack-external" value="198.51.100.24" required /><small>Fictional TEST-NET addresses only.</small></label>
-          <label class="field" id="field-destination"><span>Destination device</span><select id="attack-destination"></select></label>
+        <fieldset id="attack-settings"><legend>3 · Configurează comportamentul virtual</legend>
+          <label class="field" id="field-direction"><span>Direcție trafic</span><select id="attack-direction"><option value="inbound">INTRARE (extern → dispozitiv)</option><option value="outbound">IEȘIRE (dispozitiv → extern)</option></select></label>
+          <label class="field" id="field-external"><span id="external-label">Sursă IP externă</span><input id="attack-external" value="198.51.100.24" required /></label>
+          <label class="field" id="field-destination"><span>Dispozitiv destinație</span><select id="attack-destination"></select></label>
           <div class="settings-grid">
-            <label class="field" id="field-count"><span id="count-label">Requests</span><input id="attack-count" type="number" min="5" max="64" value="12" required /></label>
-            <label class="field"><span>Virtual duration (seconds)</span><input id="attack-duration" type="number" min="3" max="30" value="10" required /></label>
-            <label class="field" id="field-pps"><span>Packets / second</span><input id="attack-pps" type="number" min="1000" max="50000" value="5000" required /></label>
-            <label class="field" id="field-bps"><span>Bytes / second</span><input id="attack-bps" type="number" min="1000000" max="10000000" value="2000000" required /></label>
-            <label class="field" id="field-port"><span>Virtual destination port</span><input id="attack-port" type="number" min="1" max="65535" placeholder="Device default" /></label>
+            <label class="field" id="field-count"><span id="count-label">Număr cereri</span><input id="attack-count" type="number" min="5" max="64" value="12" required /></label>
+            <label class="field"><span>Durată (secunde)</span><input id="attack-duration" type="number" min="3" max="30" value="10" required /></label>
+            <label class="field" id="field-pps"><span>Pachete / secundă</span><input id="attack-pps" type="number" min="1000" max="50000" value="5000" required /></label>
+            <label class="field" id="field-bps"><span>Octeți / secundă</span><input id="attack-bps" type="number" min="1000000" max="10000000" value="2000000" required /></label>
+            <label class="field" id="field-port"><span>Port de destinație virtual</span><input id="attack-port" type="number" min="1" max="65535" placeholder="Valoare implicită dispozitiv" /></label>
           </div>
         </fieldset>
         <p id="attack-preview" class="traffic-preview"></p>
         <p id="attack-validation" class="mesaj mesaj--eroare" role="alert"></p>
-        <button id="execute-attack" class="buton buton--principal execute" type="button" disabled>Execute Attack</button>
-        <p class="hint">Uses the administration token above. Time windows replay immediately in compressed virtual time. No packets or data leave the simulator.</p>
+        <button id="execute-attack" class="buton buton--principal execute" type="button" disabled>Execută atac</button>
       </form>
     </section>
     <section class="card card--harta" aria-labelledby="t-harta">
       <h2 id="t-harta" class="card__titlu">Hartă zone și dispozitive</h2>
       <svg id="harta" viewBox="0 0 640 360" role="img" aria-label="Hartă schematică a zonelor aeroportului">
         <g class="zona"><rect x="10" y="10" width="305" height="165" rx="10" /><text x="24" y="34">Terminal</text></g>
-        <g class="zona"><rect x="325" y="10" width="305" height="165" rx="10" /><text x="339" y="34">Platformă (airside)</text></g>
+        <g class="zona"><rect x="325" y="10" width="305" height="165" rx="10" /><text x="339" y="34">Platformă</text></g>
         <g class="zona"><rect x="10" y="185" width="305" height="165" rx="10" /><text x="24" y="209">Perimetru</text></g>
         <g class="zona"><rect x="325" y="185" width="305" height="165" rx="10" /><text x="339" y="209">Operațiuni</text></g>
         <g id="harta-dispozitive"></g>
       </svg>
       <ul class="legenda">
-        <li><span class="punct punct--online"></span>Online</li>
+        <li><span class="punct punct--online"></span>Conectat</li>
         <li><span class="punct punct--isolated"></span>Izolat</li>
-        <li><span class="punct punct--offline"></span>Offline</li>
+        <li><span class="punct punct--offline"></span>Deconectat</li>
         <li><span class="punct punct--activ"></span>Activitate recentă de atac</li>
       </ul>
     </section>
 
-    <section class="card card--results" aria-labelledby="t-results" aria-live="polite"><h2 id="t-results" class="card__titlu">Execution results</h2><div id="execution-results"><p class="hint">No manual executions in this run.</p></div></section>
+    <section class="card card--results" aria-labelledby="t-results" aria-live="polite"><h2 id="t-results" class="card__titlu">Rezultate execuție</h2><div id="execution-results"><p class="hint">Nu există execuții manuale în această rulare.</p></div></section>
 
-    <section class="card card--scenariu" aria-labelledby="t-scenariu"><details><summary>Legacy scenario controls · optional</summary><div class="actiuni">        <button id="btn-auto" class="buton buton--principal">Pornește AUTO</button>
-        <button id="btn-live" class="buton">Pornește LIVE</button>
-        <button id="btn-pas" class="buton">Pasul următor</button>
-        <button id="btn-stop" class="buton buton--pericol">Oprește</button>
-</div>
-      <h2 id="t-scenariu" class="card__titlu">Scenariu: <span id="scenariu-nume">Compromised Vendor</span></h2>
-      <ol id="etape" class="etape"></ol></details>
-    </section>
-
-    <section class="card card--flux" aria-labelledby="t-flux">
+<section class="card card--flux" aria-labelledby="t-flux">
       <div class="card__antet">
         <h2 id="t-flux" class="card__titlu">Flux de evenimente</h2>
         <label class="comutator">
           <input id="filtru-sintetic" type="checkbox" checked />
-          <span>Ascunde heartbeat</span>
+          <span>Ascunde semnalele de funcționare</span>
         </label>
       </div>
-      <label class="field event-filter"><span>Device filter</span><select id="event-device"><option value="">All devices</option></select></label><div class="tabel-container">
+      <label class="field event-filter"><span>Filtru dispozitive</span><select id="event-device"><option value="">Toate dispozitivele</option></select></label><div class="tabel-container">
         <table class="tabel">
           <thead>
             <tr><th>#</th><th>Ora</th><th>Dispozitiv</th><th>Tip</th><th>Rezultat</th><th>Origine</th><th>Sursă → Destinație</th></tr>
@@ -127,7 +83,7 @@
     </section>
   </main>
 
-  <script src="panel.js"></script>
-  <script src="manual.js"></script>
+  <script src="panel.js?v=ro-2"></script>
+  <script src="manual.js?v=ro-2"></script>
 </body>
 </html>

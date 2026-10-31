@@ -10,12 +10,12 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 from .store import utc_now
 
 CATALOG = [
-    {"id": "brute_force", "name": "Repeated Login Attempts / Brute Force", "description": "Repeated failed authentication against the selected virtual service."},
-    {"id": "port_scan", "name": "Port Scanning", "description": "One simulated source contacts distinct virtual ports; open ports reflect device services."},
-    {"id": "dos", "name": "Traffic Flood / DoS", "description": "Consecutive one-second flow observations at the configured virtual packet rate."},
-    {"id": "unauthorized_access", "name": "Unauthorized Access", "description": "Repeated denied operations on a protected virtual resource."},
-    {"id": "lateral_movement", "name": "Lateral Movement Attempt", "description": "The selected source device attempts a link forbidden by the virtual network policy."},
-    {"id": "exfiltration", "name": "Data Exfiltration Attempt", "description": "Aggregate outbound transfer to an unapproved fictional destination; no real data is accessed."},
+    {"id": "brute_force", "name": "Repeated Login Attempts / Brute Force", "description": "Simulează autentificări eșuate repetate la serviciul virtual al dispozitivului selectat."},
+    {"id": "port_scan", "name": "Port Scanning", "description": "O sursă simulată încearcă să se conecteze la porturi virtuale distincte. Porturile deschise corespund serviciilor dispozitivului."},
+    {"id": "dos", "name": "Traffic Flood / DoS", "description": "Simulează un volum ridicat de trafic, cu măsurători pentru fiecare secundă, la rata de pachete configurată."},
+    {"id": "unauthorized_access", "name": "Unauthorized Access", "description": "Simulează încercări repetate de acces fără permisiuni la o resursă protejată. Operațiunile sunt refuzate."},
+    {"id": "lateral_movement", "name": "Lateral Movement Attempt", "description": "Dispozitivul sursă selectat încearcă să comunice cu un alt dispozitiv intern printr-o legătură interzisă de politica rețelei virtuale."},
+    {"id": "exfiltration", "name": "Data Exfiltration Attempt", "description": "Simulează transferul unui volum mare de date către o destinație externă fictivă, neaprobată. Nu sunt accesate sau transferate date reale."},
 ]
 TEST_NETWORKS = [ip_network(n) for n in ("192.0.2.0/24", "198.51.100.0/24", "203.0.113.0/24")]
 
@@ -39,7 +39,7 @@ class AttackRequest(BaseModel):
     def test_address(cls, value):
         address = ip_address(value)
         if not any(address in network for network in TEST_NETWORKS):
-            raise ValueError("Use a fictional IPv4 TEST-NET address (192.0.2.x, 198.51.100.x or 203.0.113.x).")
+            raise ValueError("Folosește o adresă IPv4 fictivă TEST-NET (192.0.2.x, 198.51.100.x sau 203.0.113.x).")
         return str(address)
 
 
@@ -65,24 +65,24 @@ class AttackEngine:
         existing = sim.store.get_execution(str(r.execution_id))
         if existing:
             if existing[0] != body:
-                raise ValueError("Execution ID already used with different settings.")
+                raise ValueError("Identificatorul execuției a fost deja folosit cu alte setări.")
             return existing[1]
         device = sim.registry.get(r.device_id)
         if not device or device.status != "online":
-            raise ValueError("Select an online virtual device.")
+            raise ValueError("Selectează un dispozitiv virtual conectat.")
         if sim.scenario.state in ("running", "paused"):
-            raise ValueError("Stop the legacy scenario before executing an independent attack.")
+            raise ValueError("Oprește scenariul anterior înainte de a executa un atac independent.")
         if r.attack == "exfiltration" and device.type == "access_control":
-            raise ValueError("Access controllers do not support the bulk-data demo profile.")
+            raise ValueError("Controlerele de acces nu acceptă profilul de transfer masiv de date.")
         destination = device
         port = r.port or device.port
         if r.attack == "lateral_movement":
             destination = sim.registry.get(r.destination_device_id)
             if not destination or destination == device or destination.status != "online":
-                raise ValueError("Select a different online internal destination.")
+                raise ValueError("Selectează un alt dispozitiv intern conectat ca destinație.")
             port = r.port or destination.port
             if permitted(device, destination, port):
-                raise ValueError("This link is allowed by policy. Select a forbidden destination or port.")
+                raise ValueError("Această legătură este permisă de politică. Selectează o destinație sau un port interzis.")
         outbound = r.attack in ("lateral_movement", "exfiltration") or r.attack == "dos" and r.direction == "outbound"
         src = device.ip if outbound else r.external_ip
         dst = destination.ip if r.attack == "lateral_movement" else r.external_ip if outbound else device.ip

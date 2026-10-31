@@ -36,16 +36,6 @@ function PanouPrincipal({ soc }: { soc: DateSoc }) {
 
   return (
     <section className="pagina" aria-labelledby="titlu-panou">
-      <header className="pagina__antet">
-        <p className="pagina__eticheta">Panou principal</p>
-        <h1 id="titlu-panou" className="pagina__titlu">
-          Prezentare generală a aeroportului
-        </h1>
-        <p className="pagina__subtitlu">
-          Monitorizarea securității și disponibilității sistemelor de supraveghere
-        </p>
-      </header>
-
       {soc.conectat ? (
         <IndicatoriSoc soc={soc} />
       ) : (

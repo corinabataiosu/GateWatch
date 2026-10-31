@@ -93,19 +93,6 @@ export function PaginaRapoarte({ soc }: { soc?: DateSoc }) {
 
   return (
     <section className="pagina" aria-labelledby="titlu-rapoarte">
-      {mesajNotificare && (
-        <div className="notificare-plutitoare" role="status">
-          <span className="notificare-plutitoare__bifa">✓</span>
-          <span>{mesajNotificare}</span>
-        </div>
-      )}
-
-      <AntetPagina
-        id="titlu-rapoarte"
-        eticheta="Secțiune"
-        titlu="Rapoarte"
-        subtitlu="Generare, vizualizare și descărcare rapoarte operaționale și de securitate."
-      />
 
       {/* 1. Secțiune Generare Raport PDF pe Categorii */}
       <div className="panou-rapoarte">

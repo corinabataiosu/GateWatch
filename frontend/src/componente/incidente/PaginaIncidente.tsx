@@ -335,12 +335,6 @@ export function PaginaIncidente({ soc }: { soc: DateSoc }) {
 
   return (
     <section className="pagina" aria-labelledby="titlu-incidente">
-      <AntetPagina
-        id="titlu-incidente"
-        eticheta="Secțiune"
-        titlu="Incidente"
-        subtitlu="Incidente corelate de SOC din alertele generate de reguli și de modelul ML."
-      />
 
       {!conectat && !soc.seIncarca ? (
         <MesajSocIndisponibil eroare={soc.eroare} />

@@ -25,12 +25,6 @@ export function PaginaCamere({ soc }: { soc: DateSoc }) {
 
   return (
     <section className="pagina" aria-labelledby="titlu-camere">
-      <AntetPagina
-        id="titlu-camere"
-        eticheta="Secțiune"
-        titlu="Camere"
-        subtitlu="Starea operațională și starea de securitate a camerelor de supraveghere, raportate de SOC."
-      />
 
       <FluxCamera identificator={CAMERA_CU_FLUX} deschis={fluxDeschis} onSchimba={setFluxDeschis} />
 

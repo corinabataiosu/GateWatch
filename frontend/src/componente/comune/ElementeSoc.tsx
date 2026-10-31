@@ -51,19 +51,16 @@ export function MesajSocIndisponibil({ eroare }: { eroare: string | null }) {
 
 /** Antetul standard al unei pagini. */
 export function AntetPagina({
-  eticheta,
   titlu,
   subtitlu,
   id,
 }: {
-  eticheta: string
   titlu: string
   subtitlu?: string
   id: string
 }) {
   return (
     <header className="pagina__antet">
-      <p className="pagina__eticheta">{eticheta}</p>
       <h1 id={id} className="pagina__titlu">
         {titlu}
       </h1>

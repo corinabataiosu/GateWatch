@@ -1,0 +1,1082 @@
+.structura-aplicatie {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  background-color: var(--fundal-aplicatie);
+}
+
+.sari-la-continut {
+  position: absolute;
+  top: -100px;
+  left: 16px;
+  z-index: 100;
+  padding: 10px 16px;
+  border-radius: var(--raza-mica);
+  background-color: var(--accent);
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: top 0.15s ease;
+}
+
+.sari-la-continut:focus-visible {
+  top: 12px;
+}
+
+/* Antet */
+
+.antet {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 64px;
+  padding: 0 28px;
+  background-color: var(--fundal-suprafata);
+  border-bottom: 1px solid var(--chenar);
+}
+
+.antet__marca {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.antet__logo {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background-color: var(--accent);
+  color: #ffffff;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.antet__identitate {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.2;
+}
+
+.antet__titlu {
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-principal);
+}
+
+.antet__subtitlu {
+  overflow: hidden;
+  font-size: 0.75rem;
+  color: var(--text-secundar);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.antet__actiuni {
+  display: flex;
+  align-items: center;
+  flex: none;
+}
+
+.indicator-demonstrativ {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border: 1px solid #c7d7f7;
+  border-radius: 999px;
+  background-color: var(--accent-soft);
+  color: var(--accent-puternic);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.indicator-demonstrativ__punct {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
+}
+
+/* Structura principală */
+
+.corp-aplicatie {
+  display: grid;
+  flex: 1;
+  grid-template-columns: 252px minmax(0, 1fr);
+  min-height: 0;
+}
+
+/* Meniu lateral */
+
+.meniu-lateral {
+  position: sticky;
+  top: 64px;
+  align-self: start;
+  height: calc(100svh - 64px);
+  padding: 24px 16px;
+  overflow-y: auto;
+  background-color: var(--fundal-lateral);
+  border-right: 1px solid var(--chenar);
+}
+
+.meniu-lateral__titlu {
+  margin: 0 0 12px;
+  padding: 0 12px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-discret);
+}
+
+.meniu-lateral__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.meniu-lateral__buton {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background-color: transparent;
+  color: var(--text-secundar);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.meniu-lateral__buton:hover {
+  background-color: #eef2f7;
+  color: var(--text-principal);
+}
+
+.meniu-lateral__buton--activ {
+  border-color: #d3e0fb;
+  background-color: var(--accent-soft);
+  color: var(--accent-puternic);
+}
+
+.meniu-lateral__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  margin-top: 1px;
+  color: var(--text-discret);
+}
+
+.meniu-lateral__buton--activ .meniu-lateral__icon {
+  color: var(--accent);
+}
+
+.meniu-lateral__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.meniu-lateral__eticheta {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.meniu-lateral__descriere {
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--text-discret);
+}
+
+.meniu-lateral__buton--activ .meniu-lateral__descriere {
+  color: #3b5bab;
+}
+
+/* Zona de conținut */
+
+.continut-principal {
+  min-width: 0;
+  padding: 32px;
+  background-color: var(--fundal-aplicatie);
+}
+
+.continut-principal:focus-visible {
+  outline: 3px solid rgba(29, 78, 216, 0.55);
+  outline-offset: -3px;
+}
+
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.pagina__antet {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pagina__eticheta {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.pagina__titlu {
+  margin: 0;
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--text-principal);
+}
+
+.pagina__subtitlu {
+  max-width: 68ch;
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text-secundar);
+}
+
+/* Vizualizare 3D */
+
+.spatiu-3d {
+  display: flex;
+  flex-direction: column;
+  min-height: clamp(360px, 62vh, 680px);
+  overflow: hidden;
+  background-color: var(--fundal-suprafata);
+  border: 1px solid var(--chenar);
+  border-radius: var(--raza-mare);
+  box-shadow: var(--umbra-suprafata);
+}
+
+.spatiu-3d__bara {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 20px;
+  background-color: #fcfdff;
+  border-bottom: 1px solid var(--chenar);
+}
+
+.spatiu-3d__eticheta {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secundar);
+}
+
+.spatiu-3d__stare {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background-color: #f1f5f9;
+  color: var(--text-secundar);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.spatiu-3d__stare::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--chenar-puternic);
+}
+
+.spatiu-3d__stare--activ {
+  background-color: #e7f6ee;
+  color: #16794a;
+}
+
+.spatiu-3d__stare--activ::before {
+  background-color: #1f9d63;
+}
+
+.scena-aeroport {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background-image: linear-gradient(180deg, #fafcfe 0%, #e9eef6 100%);
+  touch-action: none;
+}
+
+.scena-aeroport__eticheta {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  z-index: 2;
+  padding: 5px 10px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.86);
+  color: var(--text-secundar);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.scena-aeroport__indiciu {
+  position: absolute;
+  right: 16px;
+  bottom: 14px;
+  z-index: 2;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.78);
+  color: var(--text-discret);
+  font-size: 0.75rem;
+  pointer-events: none;
+}
+
+.scena-aeroport__incarcare {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background-color: #f2f6fb;
+  color: var(--text-secundar);
+  font-size: 0.875rem;
+}
+
+.scena-aeroport__spinner {
+  width: 26px;
+  height: 26px;
+  border: 3px solid rgba(29, 78, 216, 0.18);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: rotire-incarcare 0.8s linear infinite;
+}
+
+.scena-aeroport__fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 24px;
+  background-color: #f2f6fb;
+  color: var(--text-secundar);
+  text-align: center;
+}
+
+@keyframes rotire-incarcare {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Pagini temporare */
+
+.pagina-temporara {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 720px;
+  padding: 32px;
+  background-color: var(--fundal-suprafata);
+  border: 1px solid var(--chenar);
+  border-radius: var(--raza-mare);
+  box-shadow: var(--umbra-suprafata);
+}
+
+.pagina-temporara__eticheta {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background-color: #f1f5f9;
+  color: var(--text-secundar);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.pagina-temporara__mesaj {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text-secundar);
+}
+
+/* Responsive */
+
+@media (max-width: 860px) {
+  .antet {
+    padding: 0 18px;
+  }
+
+  .corp-aplicatie {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .meniu-lateral {
+    position: static;
+    height: auto;
+    padding: 10px 12px;
+    overflow: visible;
+    border-right: none;
+    border-bottom: 1px solid var(--chenar);
+  }
+
+  .meniu-lateral__titlu {
+    display: none;
+  }
+
+  .meniu-lateral__lista {
+    flex-direction: row;
+    gap: 6px;
+    padding: 4px 4px 6px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .meniu-lateral__element {
+    flex: 0 0 auto;
+  }
+
+  .meniu-lateral__buton {
+    align-items: center;
+    gap: 8px;
+    width: auto;
+    padding: 8px 12px;
+    white-space: nowrap;
+  }
+
+  .meniu-lateral__icon {
+    width: 20px;
+    height: 20px;
+    margin-top: 0;
+  }
+
+  .meniu-lateral__descriere {
+    display: none;
+  }
+
+  .continut-principal {
+    padding: 24px 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .antet {
+    min-height: 60px;
+    padding: 0 16px;
+  }
+
+  .antet__logo {
+    width: 34px;
+    height: 34px;
+  }
+
+  .antet__subtitlu {
+    display: none;
+  }
+
+  .indicator-demonstrativ {
+    gap: 6px;
+    padding: 6px 10px;
+    font-size: 0.75rem;
+  }
+
+  .continut-principal {
+    padding: 20px 16px;
+  }
+
+  .pagina {
+    gap: 18px;
+  }
+
+  .pagina__titlu {
+    font-size: 1.375rem;
+  }
+
+  .pagina__subtitlu {
+    font-size: 0.9375rem;
+  }
+
+  .spatiu-3d {
+    min-height: 360px;
+    border-radius: var(--raza);
+  }
+
+  .scena-aeroport__eticheta {
+    top: 10px;
+    left: 10px;
+    font-size: 0.625rem;
+  }
+
+  .scena-aeroport__indiciu {
+    right: 10px;
+    bottom: 10px;
+    font-size: 0.6875rem;
+  }
+
+  .pagina-temporara {
+    padding: 24px 18px;
+    border-radius: var(--raza);
+  }
+}
+
+@media (max-width: 375px) {
+  .antet {
+    gap: 8px;
+    padding: 0 12px;
+  }
+
+  .antet__marca {
+    gap: 8px;
+  }
+
+  .antet__titlu {
+    font-size: 1rem;
+  }
+
+  .indicator-demonstrativ {
+    gap: 5px;
+    padding: 5px 8px;
+    font-size: 0.6875rem;
+  }
+
+  .meniu-lateral {
+    padding: 8px 10px;
+  }
+
+  .meniu-lateral__buton {
+    padding: 8px 10px;
+  }
+
+  .continut-principal {
+    padding: 16px 12px;
+  }
+
+  .pagina-temporara {
+    padding: 20px 14px;
+  }
+}
+
+/* Panou stare cameră */
+
+.panou-stare-camera {
+  --stare-buna: #1d4ed8;
+  --stare-atentie: #b45309;
+  --stare-alerta: #b42318;
+  --stare-neutra: #64748b;
+
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  background-color: var(--fundal-suprafata);
+  border: 1px solid var(--chenar);
+  border-radius: var(--raza-mare);
+  box-shadow: var(--umbra-suprafata);
+}
+
+.panou-stare-camera__antet {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.panou-stare-camera__identitate {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.panou-stare-camera__eticheta {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.panou-stare-camera__titlu {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--text-principal);
+}
+
+.panou-stare-camera__meta {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--text-secundar);
+}
+
+.panou-stare-camera__insigne {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.insigna-demonstrativa,
+.insigna-scenariu {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.insigna-demonstrativa {
+  background-color: var(--accent-soft);
+  border-color: #c7d7f7;
+  color: var(--accent-puternic);
+}
+
+.insigna-scenariu {
+  background-color: #f1f5f9;
+  border-color: var(--chenar);
+  color: var(--text-secundar);
+}
+
+.insigna-scenariu--buna {
+  background-color: var(--accent-soft);
+  border-color: #c7d7f7;
+  color: var(--accent-puternic);
+}
+
+.insigna-scenariu--atentie {
+  background-color: #fffbeb;
+  border-color: #fde68a;
+  color: #92400e;
+}
+
+.insigna-scenariu--alerta {
+  background-color: var(--alerta-soft);
+  border-color: #fecdca;
+  color: var(--alerta);
+}
+
+.panou-stare-camera__anunt {
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--chenar);
+  border-radius: 10px;
+  background-color: #f8fafc;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-secundar);
+}
+
+.panou-stare-camera__grila {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.indicator-camera {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--chenar);
+  border-radius: 12px;
+  background-color: #f8fafc;
+}
+
+.indicator-camera__eticheta {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-discret);
+}
+
+.indicator-camera__valoare {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.indicator-camera__valoare::before {
+  content: '';
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: currentColor;
+}
+
+.indicator-camera__valoare--buna {
+  color: var(--stare-buna);
+}
+
+.indicator-camera__valoare--atentie {
+  color: var(--stare-atentie);
+}
+
+.indicator-camera__valoare--alerta {
+  color: var(--stare-alerta);
+}
+
+.indicator-camera__valoare--neutra {
+  color: var(--stare-neutra);
+}
+
+.indicator-camera__detaliu {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--text-discret);
+}
+
+.panou-stare-camera__detaliu-analiza {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-secundar);
+}
+
+.panou-stare-camera__detaliu-analiza span {
+  font-weight: 600;
+  color: var(--text-principal);
+}
+
+.panou-stare-camera__sectiune {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.panou-stare-camera__titlu-sectiune {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text-principal);
+}
+
+.panou-stare-camera__numar-alerte {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background-color: #f1f5f9;
+  color: var(--text-secundar);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.metrici-camera {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.metrici-camera__element {
+  padding: 12px 14px;
+  border: 1px solid var(--chenar);
+  border-radius: 10px;
+  background-color: var(--fundal-suprafata);
+}
+
+.metrici-camera__eticheta {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-discret);
+}
+
+.metrici-camera__valoare {
+  margin: 4px 0 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-principal);
+  font-variant-numeric: tabular-nums;
+}
+
+.metrici-camera__valoare--indisponibil {
+  font-weight: 600;
+  color: var(--text-discret);
+}
+
+.panou-stare-camera__controale {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.panou-stare-camera__legenda {
+  padding: 0;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-discret);
+}
+
+.panou-stare-camera__butoane {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.buton-scenariu {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 9px 16px;
+  border: 1px solid var(--chenar-puternic);
+  border-radius: 9px;
+  background-color: var(--fundal-suprafata);
+  color: var(--text-secundar);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.3;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.buton-scenariu:hover {
+  border-color: #94a3b8;
+  background-color: #f1f5f9;
+  color: var(--text-principal);
+}
+
+.buton-scenariu--activ {
+  border-color: #c7d7f7;
+  background-color: var(--accent-soft);
+  color: var(--accent-puternic);
+}
+
+.buton-scenariu--activ:hover {
+  border-color: #c7d7f7;
+  background-color: var(--accent-soft);
+  color: var(--accent-puternic);
+}
+
+.alerte-camera {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.alerta-camera {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  border: 1px solid var(--chenar);
+  border-left: 4px solid var(--stare-neutra);
+  border-radius: 10px;
+  background-color: var(--fundal-suprafata);
+}
+
+.alerta-camera--alerta {
+  border-left-color: var(--stare-alerta);
+  background-color: #fffbfa;
+}
+
+.alerta-camera--atentie {
+  border-left-color: var(--stare-atentie);
+  background-color: #fffdf7;
+}
+
+.alerta-camera--neutra {
+  border-left-color: var(--stare-neutra);
+  background-color: #f8fafc;
+}
+
+.alerta-camera__antet {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.alerta-camera__severitate {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.alerta-camera__severitate--alerta {
+  background-color: var(--alerta-soft);
+  color: var(--alerta);
+}
+
+.alerta-camera__severitate--atentie {
+  background-color: #fffbeb;
+  color: #92400e;
+}
+
+.alerta-camera__severitate--neutra {
+  background-color: #f1f5f9;
+  color: var(--text-secundar);
+}
+
+.alerta-camera__tip {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secundar);
+}
+
+.alerta-camera__ora {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--text-discret);
+  font-variant-numeric: tabular-nums;
+}
+
+.alerta-camera__mesaj {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-principal);
+  overflow-wrap: anywhere;
+}
+
+.alerta-camera__meta {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--text-discret);
+}
+
+.panou-stare-camera__fara-alerte {
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px dashed var(--chenar-puternic);
+  border-radius: 10px;
+  background-color: #f8fafc;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-secundar);
+}
+
+.panou-stare-camera__nota {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--text-discret);
+}
+
+@media (max-width: 860px) {
+  .panou-stare-camera {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .panou-stare-camera {
+    gap: 16px;
+    padding: 18px;
+    border-radius: var(--raza);
+  }
+
+  .panou-stare-camera__antet {
+    flex-direction: column;
+  }
+
+  .panou-stare-camera__grila {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .panou-stare-camera__butoane {
+    flex-direction: column;
+  }
+
+  .buton-scenariu {
+    width: 100%;
+  }
+
+  .alerta-camera__ora {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .panou-stare-camera {
+    padding: 16px;
+  }
+
+  .panou-stare-camera__grila {
+    grid-template-columns: 1fr;
+  }
+
+  .metrici-camera {
+    grid-template-columns: 1fr;
+  }
+}

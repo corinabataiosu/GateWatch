@@ -26,6 +26,7 @@ from caracteristici_video import RezultatCaracteristici, calculeaza_caracteristi
 from flux_video import PublicatorCadre, porneste_server
 from model_video import CALE_MODEL_IMPLICIT, DetectorVideo
 from sursa_video import MODURI_SINTETICE, EroareSursaVideo, SursaCamera, SursaSintetica
+from esantionare_video import FPS_IMPLICIT, RitmCadre, fps_valid
 
 
 def construieste_telemetrie(id_camera, rezultat: RezultatCaracteristici, evaluare, prag, versiune, sursa):
@@ -66,7 +67,7 @@ def main():
                         help="modificarea simulata a imaginii (doar sursa sintetica)")
     parser.add_argument("--dupa", type=float, default=0, help="secunde de imagine normala inainte de scenariu")
     parser.add_argument("--durata", type=float, default=0, help="secunde de rulare (0 = pana la Ctrl+C)")
-    parser.add_argument("--fps", type=float, default=5)
+    parser.add_argument("--fps", type=fps_valid, default=FPS_IMPLICIT)
     parser.add_argument("--model", default=CALE_MODEL_IMPLICIT)
     parser.add_argument("--soc", default="http://127.0.0.1:8000")
     parser.add_argument("--token", default="gatewatch-admin")
@@ -80,18 +81,30 @@ def main():
     print(f"agent video {args.id_camera}: sursa {args.sursa}, model {detector.versiune}, prag {detector.prag:.3f}")
 
     publicator = None
-    if args.port_flux:
-        publicator = PublicatorCadre()
-        porneste_server(publicator, args.port_flux)
-        print(f"flux video: http://127.0.0.1:{args.port_flux}/flux.mjpg")
+    server = None
 
     start = time.monotonic()
     ultima_trimitere = 0.0
     anterior = None
+    ritm = RitmCadre(args.fps)
     try:
+        if args.port_flux:
+            publicator = PublicatorCadre()
+            server = porneste_server(publicator, args.port_flux)
+            print(f"flux video: http://127.0.0.1:{args.port_flux}/flux.mjpg")
         while not args.durata or time.monotonic() - start < args.durata:
+            ritm.asteapta_cadru()
             mod = args.scenariu if time.monotonic() - start >= args.dupa else "normal"
-            cadru = sursa.citeste(mod)
+            try:
+                cadru = sursa.citeste(mod)
+            except EroareSursaVideo as eroare:
+                if args.sursa != "camera":
+                    raise
+                # Do not score a cached frame or compare across a capture outage.
+                anterior = None
+                print(f"camera indisponibila: {eroare}; reincercare in 1 s", file=sys.stderr, flush=True)
+                time.sleep(1.0)
+                continue
             rezultat = calculeaza_caracteristici(cadru, anterior)
             anterior = cadru
             if publicator:
@@ -110,7 +123,6 @@ def main():
                 print(f"[{mod:<12}] lum {telemetrie['brightness']:6.1f}  clar {telemetrie['sharpness']:8.1f}  "
                       f"dif {telemetrie['frame_diff']:5.2f}  scor {telemetrie['score']:.3f}  {stare}{alerta}",
                       flush=True)
-            time.sleep(1.0 / args.fps)
     except KeyboardInterrupt:
         pass
     except EroareSursaVideo as eroare:
@@ -118,6 +130,9 @@ def main():
         return 2
     finally:
         sursa.elibereaza()
+        if server:
+            server.shutdown()
+            server.server_close()
     return 0
 
 

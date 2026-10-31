@@ -17,6 +17,8 @@ supraveghere trebuie sa le semnaleze:
 Modulul nu salveaza nicio imagine.
 """
 
+import os
+
 import cv2
 import numpy as np
 
@@ -98,20 +100,39 @@ class SursaSintetica:
         """Compatibilitate cu SursaCamera; nu exista resurse de eliberat."""
 
 
+def deschide_camera(index):
+    """Prefer Windows camera backends over automatic FFmpeg device selection."""
+    backends = (cv2.CAP_DSHOW, cv2.CAP_MSMF, cv2.CAP_ANY) if os.name == "nt" else (cv2.CAP_ANY,)
+    for backend in backends:
+        captura = cv2.VideoCapture(index, backend)
+        if captura.isOpened():
+            return captura
+        captura.release()
+    raise EroareSursaVideo(f"camera cu indexul {index} nu poate fi deschisa")
+
+
 class SursaCamera:
     """Camera fizica (index OpenCV)."""
 
     def __init__(self, index=0):
-        self._captura = cv2.VideoCapture(index)
-        if not self._captura.isOpened():
-            raise EroareSursaVideo(f"camera cu indexul {index} nu poate fi deschisa")
+        self._index = index
+        self._captura = deschide_camera(index)
 
     def citeste(self, mod="normal", iluminare=1.0):
         # Modul si iluminarea se aplica doar sursei sintetice; camera reala livreaza ce vede.
-        reusit, cadru = self._captura.read()
+        if self._captura is None:
+            self._captura = deschide_camera(self._index)
+        try:
+            reusit, cadru = self._captura.read()
+        except cv2.error as eroare:
+            self.elibereaza()
+            raise EroareSursaVideo(str(eroare)) from eroare
         if not reusit or cadru is None:
+            self.elibereaza()
             raise EroareSursaVideo("camera nu a returnat niciun cadru")
         return cadru
 
     def elibereaza(self):
-        self._captura.release()
+        if self._captura is not None:
+            self._captura.release()
+            self._captura = None

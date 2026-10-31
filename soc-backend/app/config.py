@@ -14,6 +14,7 @@ class Settings:
     poll_interval: float = field(default_factory=lambda: float(os.getenv("GATEWATCH_POLL_INTERVAL", "1.0")))
     device_poll_interval: float = 5.0
     page_size: int = 500
+    max_pages_per_poll: int = 10
     # Disabled in tests so the pipeline can be driven synchronously.
     ingestion_enabled: bool = field(default_factory=lambda: os.getenv("GATEWATCH_INGESTION", "1") == "1")
 

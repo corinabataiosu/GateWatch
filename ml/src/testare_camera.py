@@ -17,6 +17,9 @@ import argparse
 import sys
 import time
 
+import cv2
+from sursa_video import deschide_camera, EroareSursaVideo
+
 
 NUME_FEREASTRA = "GateWatch - testare camera"
 TASTE_IESIRE = {"q", "Q"}
@@ -49,7 +52,7 @@ def ruleaza_flux_video(index_camera):
     camera_deschisa = False
 
     try:
-        captura = cv2.VideoCapture(index_camera)
+        captura = deschide_camera(index_camera)
 
         if not captura.isOpened():
             print(f"[EROARE] Nu s-a putut deschide camera cu indexul {index_camera}.")
@@ -99,7 +102,7 @@ def ruleaza_flux_video(index_camera):
                 print("[INFO] Iesire ceruta de utilizator (tasta Q).")
                 break
 
-    except cv2.error as exceptie:
+    except (cv2.error, EroareSursaVideo) as exceptie:
         print(f"[EROARE] Eroare OpenCV in timpul capturii: {exceptie}")
         cod_iesire = 1
     except KeyboardInterrupt:

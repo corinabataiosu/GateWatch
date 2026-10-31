@@ -33,6 +33,7 @@ from sklearn.ensemble import IsolationForest
 
 from caracteristici_video import RezultatCaracteristici, calculeaza_caracteristici
 from sursa_video import SursaCamera, SursaSintetica
+from esantionare_video import FPS_IMPLICIT, RitmCadre, fps_valid
 
 DIRECTOR_MODELE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "models")
 CALE_MODEL_IMPLICIT = os.path.normpath(os.path.join(DIRECTOR_MODELE, "video_iforest.joblib"))
@@ -49,10 +50,13 @@ def vector(rezultat: RezultatCaracteristici):
     return [rezultat.luminozitate_medie, math.log1p(rezultat.claritate), rezultat.diferenta_cadre]
 
 
-def colecteaza(sursa, numar_cadre, iluminare_variabila=False):
+def colecteaza(sursa, numar_cadre, iluminare_variabila=False, fps=None):
     """Citeste cadre normale si intoarce matricea de caracteristici."""
     randuri, anterior = [], None
+    ritm = RitmCadre(fps) if fps is not None else None
     for index in range(numar_cadre):
+        if ritm:
+            ritm.asteapta_cadru()
         # Pentru sursa sintetica: iluminarea variaza lent (zi / seara), ca modelul
         # sa nu considere anormala orice schimbare de lumina ambientala.
         iluminare = 0.95 + 0.2 * math.sin(index / 150.0) if iluminare_variabila else 1.0
@@ -123,19 +127,26 @@ def main():
     parser.add_argument("--sursa", choices=("sintetica", "camera"), default="sintetica")
     parser.add_argument("--camera", type=int, default=0, help="indexul camerei OpenCV")
     parser.add_argument("--cadre", type=int, default=3000)
+    parser.add_argument("--fps", type=fps_valid, default=FPS_IMPLICIT,
+                        help="camera sampling rate; use the same value in agent_video.py")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--iesire", default=CALE_MODEL_IMPLICIT)
     args = parser.parse_args()
+    if args.cadre < 10:
+        parser.error("--cadre must be at least 10")
 
     if args.sursa == "sintetica":
         X = colecteaza_sintetic(args.cadre, args.seed)
     else:
         sursa = SursaCamera(args.camera)
         try:
-            X = colecteaza(sursa, args.cadre)
+            print(f"Calibrare: {args.cadre} cadre la {args.fps:g} FPS (~{args.cadre / args.fps:.0f} s).", flush=True)
+            X = colecteaza(sursa, args.cadre, fps=args.fps)
         finally:
             sursa.elibereaza()
     artefact = antreneaza(X, args.seed)
+    artefact["sursa"] = args.sursa
+    artefact["fps"] = args.fps if args.sursa == "camera" else None
     os.makedirs(os.path.dirname(os.path.abspath(args.iesire)), exist_ok=True)
     joblib.dump(artefact, args.iesire)
     fisa = {k: v for k, v in artefact.items() if k != "model"}

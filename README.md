@@ -14,6 +14,10 @@ docs/           Shared contracts (event format, APIs, scenario)
 
 ## Run the full demo
 
+For a Windows two-laptop setup with the real webcam, follow
+[the step-by-step runbook](docs/two-laptop-demo.md). Use `scripts/start-demo.ps1`
+to run each component and `scripts/check_demo.py` for non-destructive readiness checks.
+
 ```bash
 pip install -r simulator/requirements.txt -r soc-backend/requirements.txt -r ml/requirements.txt
 

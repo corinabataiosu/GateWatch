@@ -50,7 +50,7 @@ class IngestionEngine:
         self.devices: list[dict[str, Any]] = []
         self.status: dict[str, Any] = {
             "connected": False, "run_id": None, "last_seq": 0, "events_ingested": 0,
-            "last_poll_at": None, "gaps": 0, "error": None,
+            "last_poll_at": None, "gaps": 0, "error": None, "catching_up": False,
         }
         self._stop = threading.Event()
         self._thread: Optional[threading.Thread] = None
@@ -71,7 +71,7 @@ class IngestionEngine:
             self._stop.wait(self.settings.poll_interval)
 
     def poll_once(self) -> int:
-        """Fetch and process every new event of the simulator's current run. Returns the count."""
+        """Process bounded pages so a backlog cannot starve device/run refreshes."""
         try:
             health = self.client.get("/sim/health")
             run_id = health.get("run_id")
@@ -80,24 +80,32 @@ class IngestionEngine:
             if run_id != self.status["run_id"]:
                 log.info("following simulator run %s", run_id)
                 self.status["run_id"] = run_id
-            processed = self._drain(run_id)
-            if time.monotonic() - self._last_device_poll >= self.settings.device_poll_interval or not self.devices:
-                self.devices = self.client.get("/sim/devices")
-                self._last_device_poll = time.monotonic()
+                self._last_device_poll = 0.0
+            self._refresh_devices()
             self.status.update(connected=True, error=None, last_poll_at=now_iso())
+            processed = self._drain(run_id)
             return processed
         except (urllib.error.URLError, OSError, ValueError, RuntimeError) as exc:
             self.status.update(connected=False, error=str(getattr(exc, "reason", exc)), last_poll_at=now_iso())
             return 0
 
+    def _refresh_devices(self) -> None:
+        if time.monotonic() - self._last_device_poll >= self.settings.device_poll_interval or not self.devices:
+            self.devices = self.client.get("/sim/devices")
+            self._last_device_poll = time.monotonic()
+
     def _drain(self, run_id: str) -> int:
         cursor = self.db.get_cursor(run_id)
         total = 0
-        while True:
+        self.status.update(last_seq=cursor, catching_up=True)
+        for _ in range(self.settings.max_pages_per_poll):
+            if self._stop.is_set():
+                break
             page = self.client.get(
                 f"/sim/events?run_id={run_id}&after_seq={cursor}&limit={self.settings.page_size}")
             events = sorted(page.get("events", []), key=lambda e: e.get("seq", 0))
             if not events:
+                self.status["catching_up"] = False
                 break
             if events[0].get("seq") != cursor + 1:
                 self.status["gaps"] += 1
@@ -106,10 +114,13 @@ class IngestionEngine:
             cursor = max(cursor, max(int(e.get("seq", 0)) for e in events))
             self.db.set_cursor(run_id, cursor, now_iso())
             total += len(events)
+            self.status["last_seq"] = cursor
+            self.status["events_ingested"] += len(events)
+            self.status["last_poll_at"] = now_iso()
+            self._refresh_devices()
             if len(events) < self.settings.page_size:
+                self.status["catching_up"] = False
                 break
-        self.status["last_seq"] = cursor
-        self.status["events_ingested"] += total
         return total
 
     def isolate(self, device_id: str, isolated: bool = True) -> dict[str, Any]:

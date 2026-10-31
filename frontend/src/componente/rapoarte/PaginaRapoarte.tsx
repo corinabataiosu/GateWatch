@@ -15,6 +15,7 @@ import {
   MesajSocIndisponibil,
   StareGoala,
 } from '../comune/ElementeSoc'
+import { RaportGenerat } from './RaportGenerat'
 
 type RandTehnica = {
   id: string
@@ -107,6 +108,8 @@ export function PaginaRapoarte({ soc }: { soc: DateSoc }) {
               {formateazaNumarIntreg(soc.alerte.length)} alerte
             </span>
           </div>
+
+          <RaportGenerat conectat={soc.conectat} />
 
           <div className="grila-rapoarte">
             <Card titlu="Alerte deschise pe severitate">

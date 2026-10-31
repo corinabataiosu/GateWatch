@@ -6,6 +6,7 @@ import type {
   EvenimentSoc,
   IncidentSoc,
   PrezentareGeneralaSoc,
+  RaportSoc,
   StareIncident,
   StareSanatateSoc,
 } from '../tipuri/soc'
@@ -129,6 +130,16 @@ export function izoleazaDispozitiv(
     method: 'POST',
     body: JSON.stringify({ action: 'isolate_device', device_id: idDispozitiv }),
   })
+}
+
+/** Generează raportul de activitate pe baza datelor curente ale SOC. */
+export function genereazaRaport(): Promise<RaportSoc> {
+  return cerere<RaportSoc>('/api/report')
+}
+
+/** Adresa versiunii HTML a raportului, descărcabilă și tipăribilă. */
+export function adresaRaportHtml(): string {
+  return `${ADRESA_BAZA}/api/report?format=html`
 }
 
 export function reseteazaSoc(): Promise<unknown> {

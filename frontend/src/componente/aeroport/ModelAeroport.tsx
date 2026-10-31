@@ -10,10 +10,14 @@ import {
   type PerspectiveCamera,
 } from 'three'
 import { MarkerCamera } from './MarkerCamera'
-import type { IdentificatorCamera } from '../../tipuri/camera'
+import type {
+  CameraDemonstrativa,
+  IdentificatorCamera,
+} from '../../tipuri/camera'
 
 type ProprietatiModelAeroport = {
   identificatorSelectat?: IdentificatorCamera | null
+  stareCamera?: CameraDemonstrativa | null
   onSelecteazaCamera?: (identificator: IdentificatorCamera) => void
 }
 
@@ -673,6 +677,7 @@ function Cadrare() {
 
 export function ModelAeroport({
   identificatorSelectat = null,
+  stareCamera = null,
   onSelecteazaCamera,
 }: ProprietatiModelAeroport) {
   return (
@@ -719,6 +724,7 @@ export function ModelAeroport({
           pozitie={POZITIE_MARKER}
           identificator={IDENTIFICATOR_MARKER}
           selectat={identificatorSelectat === IDENTIFICATOR_MARKER}
+          stare={stareCamera}
           onSelecteaza={onSelecteazaCamera}
         />
       </group>

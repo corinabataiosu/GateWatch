@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
-import type { IdentificatorCamera } from '../../tipuri/camera'
+import type {
+  CameraDemonstrativa,
+  IdentificatorCamera,
+  ScenariuCamera,
+  StareConexiune,
+} from '../../tipuri/camera'
 import { ModelAeroport } from './ModelAeroport'
 
 const DETALII_MARKER = {
@@ -10,7 +15,51 @@ const DETALII_MARKER = {
   descrierePozitie: 'Schematică, lângă intrarea principală a terminalului',
 }
 
-export function ScenaAeroport() {
+const ETICHETE_SCENARIU: Record<ScenariuCamera, string> = {
+  normal: 'Funcționare normală',
+  avertizare: 'Anomalie simulată',
+  offline: 'Deconectare simulată',
+}
+
+const ETICHETE_CONEXIUNE: Record<StareConexiune, string> = {
+  conectata: 'Conectată',
+  instabila: 'Instabilă',
+  deconectata: 'Deconectată',
+}
+
+function formateazaScor(valoare: number | null): string {
+  if (valoare === null) {
+    return 'indisponibil'
+  }
+  return valoare.toLocaleString('ro-RO', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
+}
+
+function descriereAnalizaMl(
+  camera: CameraDemonstrativa,
+): string | null {
+  const detectie = camera.detectieAnomalii
+
+  if (!detectie.disponibil) {
+    // Fără flux video nu se atribuie un scor artificial.
+    return null
+  }
+
+  const scor = formateazaScor(detectie.scor)
+  const prag = formateazaScor(detectie.prag)
+
+  return detectie.esteAnomalie
+    ? `Anomalie detectată (scor ${scor} / prag ${prag})`
+    : `Fără anomalii (scor ${scor} / prag ${prag})`
+}
+
+type ProprietatiScenaAeroport = {
+  stareCamera?: CameraDemonstrativa | null
+}
+
+export function ScenaAeroport({ stareCamera = null }: ProprietatiScenaAeroport) {
   const [scenaPregatita, setScenaPregatita] = useState(false)
   const [identificatorSelectat, setIdentificatorSelectat] =
     useState<IdentificatorCamera | null>(null)
@@ -55,6 +104,7 @@ export function ScenaAeroport() {
       >
         <ModelAeroport
           identificatorSelectat={identificatorSelectat}
+          stareCamera={stareCamera}
           onSelecteazaCamera={(identificator) => setIdentificatorSelectat(identificator)}
         />
       </Canvas>
@@ -94,6 +144,24 @@ export function ScenaAeroport() {
               <dt>Tip dispozitiv</dt>
               <dd>{DETALII_MARKER.tipDispozitiv}</dd>
             </div>
+            {stareCamera && (
+              <div className="marker-camera__panou-element">
+                <dt>Stare conexiune</dt>
+                <dd>{ETICHETE_CONEXIUNE[stareCamera.stareConexiune]}</dd>
+              </div>
+            )}
+            {stareCamera && (
+              <div className="marker-camera__panou-element">
+                <dt>Stare scenariu</dt>
+                <dd>{ETICHETE_SCENARIU[stareCamera.scenariu]}</dd>
+              </div>
+            )}
+            {stareCamera && descriereAnalizaMl(stareCamera) && (
+              <div className="marker-camera__panou-element">
+                <dt>Analiză ML</dt>
+                <dd>{descriereAnalizaMl(stareCamera)}</dd>
+              </div>
+            )}
             <div className="marker-camera__panou-element">
               <dt>Poziție în model</dt>
               <dd>{DETALII_MARKER.descrierePozitie}</dd>

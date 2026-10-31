@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ScenaAeroport } from '../aeroport/ScenaAeroport'
 import { PanouStareCamera } from '../camere/PanouStareCamera'
+import { useCameraDemonstrativa } from '../../carlige/useCameraDemonstrativa'
 import { Antet } from './Antet'
 import { MeniuLateral, type IdPagina } from './MeniuLateral'
 
@@ -35,6 +36,13 @@ const PAGINI_TEMPORARE: Record<PaginaFaraPanou, DetaliiPaginaTemporara> = {
 }
 
 function PanouPrincipal() {
+  const {
+    camera,
+    scenariu,
+    seteazaScenariu,
+    revinoLaNormal,
+  } = useCameraDemonstrativa()
+
   return (
     <section className="pagina" aria-labelledby="titlu-panou">
       <header className="pagina__antet">
@@ -59,10 +67,15 @@ function PanouPrincipal() {
           </span>
         </div>
 
-        <ScenaAeroport />
+        <ScenaAeroport stareCamera={camera} />
       </div>
 
-      <PanouStareCamera />
+      <PanouStareCamera
+        camera={camera}
+        scenariu={scenariu}
+        onSchimbaScenariu={seteazaScenariu}
+        onRevinoLaNormal={revinoLaNormal}
+      />
     </section>
   )
 }

@@ -1,0 +1,28 @@
+# GateWatch ML - ignorate locale pentru directorul ml/
+
+# Mediu virtual Python
+.venv/
+
+# Cache Python
+__pycache__/
+*.py[cod]
+*.pyc
+
+# Fisiere temporare
+*.tmp
+*.log
+*.swp
+Thumbs.db
+.DS_Store
+
+# Capturi video si cadre locale - scriptul nu salveaza nimic,
+# dar excludem orice fisier aparut accidental in timpul testarii
+*.avi
+*.mp4
+*.mkv
+*.mov
+*.webm
+*.jpg
+*.jpeg
+*.png
+*.bmp

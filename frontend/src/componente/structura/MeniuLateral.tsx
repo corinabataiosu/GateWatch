@@ -7,7 +7,6 @@ export type IdPagina =
 type ElementNavigare = {
   id: IdPagina
   eticheta: string
-  descriere: string
 }
 
 type PropsMeniuLateral = {
@@ -16,10 +15,10 @@ type PropsMeniuLateral = {
 }
 
 const ELEMENTE_NAVIGARE: ElementNavigare[] = [
-  { id: 'panou', eticheta: 'Panou principal', descriere: 'Vedere de ansamblu' },
-  { id: 'camere', eticheta: 'Camere', descriere: 'Supraveghere video' },
-  { id: 'incidente', eticheta: 'Incidente', descriere: 'Alerte și evenimente' },
-  { id: 'rapoarte', eticheta: 'Rapoarte', descriere: 'Analiză și export' },
+  { id: 'panou', eticheta: 'Panou principal' },
+  { id: 'camere', eticheta: 'Camere' },
+  { id: 'incidente', eticheta: 'Incidente' },
+  { id: 'rapoarte', eticheta: 'Rapoarte' },
 ]
 
 function IconitaPagina({ pagina }: { pagina: IdPagina }) {
@@ -95,7 +94,6 @@ export function MeniuLateral({ paginaActiva, onSchimbaPagina }: PropsMeniuLatera
                   </span>
                   <span className="meniu-lateral__text">
                     <span className="meniu-lateral__eticheta">{element.eticheta}</span>
-                    <span className="meniu-lateral__descriere">{element.descriere}</span>
                   </span>
                 </button>
               </li>

@@ -3,6 +3,7 @@
 Run from soc-backend/:  python -m uvicorn app.main:app --port 8000
 """
 import logging
+from datetime import datetime
 import urllib.error
 from contextlib import asynccontextmanager
 from typing import Any, Literal, Optional
@@ -155,9 +156,14 @@ def create_app(config: Settings = default_settings, client: Optional[SimulatorCl
         return [alert_view(a) for a in db.query(sql + " ORDER BY updated_at DESC LIMIT ?", params + [limit])]
 
     @app.get("/api/report")
-    def report(format: Literal["json", "html"] = "json"):
+    def report(format: Literal["json", "html"] = "json", start: datetime | None = None, end: datetime | None = None):
+        from .models import iso
+        if any(value and value.tzinfo is None for value in (start, end)):
+            raise HTTPException(422, "Intervalul trebuie să includă fusul orar.")
+        if start and end and start >= end:
+            raise HTTPException(422, "Data de început trebuie să fie înaintea datei de sfârșit.")
         rule_names = {r["rule_id"]: r["name"] for r in pipeline.rules.catalog()}
-        data = build_report(db, device_rows(), rule_names)
+        data = build_report(db, device_rows(), rule_names, iso(start) if start else None, iso(end) if end else None)
         if format == "json":
             return data
         stamp = data["generated_at"][:19].replace(":", "-").replace("T", "-")

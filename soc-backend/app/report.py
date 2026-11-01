@@ -22,11 +22,26 @@ ACTION_LABELS = {"isolate_device": "izolare dispozitiv", "release_device": "anul
                  "status_change": "schimbare stare"}
 
 
-def build_report(db: Database, devices: list[dict[str, Any]], rule_names: dict[str, str]) -> dict[str, Any]:
+def build_report(db: Database, devices: list[dict[str, Any]], rule_names: dict[str, str],
+                 start: str | None = None, end: str | None = None) -> dict[str, Any]:
     names = {**rule_names, **ML_RULE_NAMES}
-    alerts = db.query("SELECT * FROM alerts ORDER BY created_at")
+    def bounds(column):
+        clauses, params = [], []
+        if start:
+            clauses.append(f"{column} >= ?")
+            params.append(start)
+        if end:
+            clauses.append(f"{column} < ?")
+            params.append(end)
+        return (" WHERE " + " AND ".join(clauses) if clauses else ""), tuple(params)
+    where, params = bounds("created_at")
+    alerts = db.query("SELECT * FROM alerts" + where + " ORDER BY created_at", params)
     incidents = db.query("SELECT * FROM incidents ORDER BY created_at")
-    window = db.one("SELECT MIN(occurred_at) AS first, MAX(occurred_at) AS last, COUNT(*) AS n FROM events")
+    if start or end:
+        incident_ids = {a["incident_id"] for a in alerts}
+        incidents = [i for i in incidents if i["incident_id"] in incident_ids]
+    event_where, event_params = bounds("occurred_at")
+    window = db.one("SELECT MIN(occurred_at) AS first, MAX(occurred_at) AS last, COUNT(*) AS n FROM events" + event_where, event_params)
 
     severity = Counter(a["severity"] for a in alerts)
     by_rule = Counter(a["rule_id"] for a in alerts)
@@ -36,6 +51,7 @@ def build_report(db: Database, devices: list[dict[str, Any]], rule_names: dict[s
     for inc in sorted(incidents, key=lambda i: (-SEVERITY_RANK[i["severity"]], i["created_at"])):
         own = [a for a in alerts if a["incident_id"] == inc["incident_id"]]
         actions = db.query("SELECT * FROM actions WHERE incident_id = ? ORDER BY created_at", (inc["incident_id"],))
+        actions = [a for a in actions if (not start or a["created_at"] >= start) and (not end or a["created_at"] < end)]
         incident_rows.append({
             "incident_id": inc["incident_id"], "title": inc["title"], "status": inc["status"],
             "severity": inc["severity"], "created_at": inc["created_at"], "last_alert_at": inc["last_alert_at"],
@@ -48,9 +64,19 @@ def build_report(db: Database, devices: list[dict[str, Any]], rule_names: dict[s
         })
 
     at_risk = [d for d in devices if d["security_state"] in ("compromised", "warning")]
+    if start or end:
+        relevant_devices = {a["device_id"] for a in alerts}
+        at_risk = [d for d in at_risk if d["device_id"] in relevant_devices]
     open_incidents = [i for i in incidents if i["status"] != "resolved"]
+    active_ids = {row["device_id"] for row in db.query("SELECT DISTINCT device_id FROM events" + event_where, event_params)}
+    active_ids.update(a["device_id"] for a in alerts)
+    selected_devices = [d for d in devices if not (start or end) or d["device_id"] in active_ids]
     return {
         "generated_at": now_iso(),
+        "filters": {"start": start, "end": end},
+        "devices": [{"device_id": d["device_id"], "name": d["name"], "zone": d["zone"],
+                     "security_state": d["security_state"], "operational_status": d["operational_status"],
+                     "open_alerts": d["open_alerts"]} for d in selected_devices],
         "period": {"first_event": window["first"] if window else None,
                    "last_event": window["last"] if window else None},
         "summary": executive_summary(alerts, incidents, open_incidents, at_risk, window["n"] if window else 0),

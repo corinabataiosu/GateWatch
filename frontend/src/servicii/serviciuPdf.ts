@@ -87,6 +87,8 @@ export function genereazaPdfRaport(raport: RaportSoc): jsPDF {
   }
 
   const t = raport.totals
+  const continut = raport.continut ?? 'toate'
+  const dispozitive = raport.devices ?? raport.devices_at_risk
 
   paragraf('GateWatch - raport de activitate SOC', 17, CULOARE_TEXT, 'bold')
   paragraf(
@@ -95,6 +97,8 @@ export function genereazaPdfRaport(raport: RaportSoc): jsPDF {
     CULOARE_SECUNDARA,
   )
 
+  if (raport.interval_selectat) paragraf('Interval selectat: ' + raport.interval_selectat.deLa + ' - ' + raport.interval_selectat.panaLa + ' (inclusiv)')
+  if (continut === 'toate') {
   titluSectiune('Rezumat')
   paragraf(raport.summary)
   y += 1
@@ -110,6 +114,8 @@ export function genereazaPdfRaport(raport: RaportSoc): jsPDF {
     CULOARE_SECUNDARA,
   )
 
+  }
+  if (continut !== 'dispozitive') {
   titluSectiune('Incidente')
   if (raport.incidents.length === 0) {
     paragraf('Nu au fost corelate incidente.')
@@ -153,13 +159,16 @@ export function genereazaPdfRaport(raport: RaportSoc): jsPDF {
     }
   }
 
-  titluSectiune('Dispozitive la risc')
-  if (raport.devices_at_risk.length === 0) {
-    paragraf('Niciun dispozitiv la risc.')
+  }
+  if (continut !== 'incidente') {
+  titluSectiune('Dispozitive cu activitate in interval')
+  paragraf('Starile si numarul alertelor deschise sunt cele curente la generarea raportului.', 8.5, CULOARE_SECUNDARA)
+  if (dispozitive.length === 0) {
+    paragraf('Niciun dispozitiv cu activitate in interval.')
   } else {
     tabel(
       ['Dispozitiv', 'Nume', 'Zona', 'Stare securitate', 'Stare operationala', 'Alerte deschise'],
-      raport.devices_at_risk.map((d) => [
+      dispozitive.map((d) => [
         d.device_id,
         d.name ?? '',
         d.zone ?? '',
@@ -170,7 +179,8 @@ export function genereazaPdfRaport(raport: RaportSoc): jsPDF {
     )
   }
 
-  if (raport.alerts_by_rule.length > 0) {
+  }
+  if (continut === 'toate' && raport.alerts_by_rule.length > 0) {
     titluSectiune('Alerte pe regula de detectie')
     tabel(
       ['Regula', 'Descriere', 'Alerte'],
@@ -178,7 +188,7 @@ export function genereazaPdfRaport(raport: RaportSoc): jsPDF {
     )
   }
 
-  if (raport.techniques.length > 0) {
+  if (continut === 'toate' && raport.techniques.length > 0) {
     titluSectiune('Tehnici MITRE ATT&CK observate')
     tabel(
       ['Tehnica', 'Denumire', 'Tactica', 'Alerte'],

@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
 import { ScenaAeroport } from '../aeroport/ScenaAeroport'
 import { PaginaCamere } from '../camere/PaginaCamere'
-import { PanouStareCamera } from '../camere/PanouStareCamera'
 import { EvenimenteRecente } from '../comune/EvenimenteRecente'
 import { IndicatoriSoc } from '../comune/IndicatoriSoc'
 import { PaginaIncidente } from '../incidente/PaginaIncidente'
@@ -14,12 +13,7 @@ import { Antet } from './Antet'
 import { MeniuLateral, type IdPagina } from './MeniuLateral'
 
 function PanouPrincipal({ soc }: { soc: DateSoc }) {
-  const {
-    camera: cameraDemonstrativa,
-    scenariu,
-    seteazaScenariu,
-    revinoLaNormal,
-  } = useCameraDemonstrativa()
+  const { camera: cameraDemonstrativa } = useCameraDemonstrativa()
 
   const dispozitivCamera = soc.conectat
     ? soc.dispozitive.find(
@@ -61,13 +55,6 @@ function PanouPrincipal({ soc }: { soc: DateSoc }) {
 
         <ScenaAeroport stareCamera={camera} dispozitiveSoc={soc.conectat ? soc.dispozitive : []} />
       </div>
-
-      <PanouStareCamera
-        camera={camera}
-        scenariu={scenariu}
-        onSchimbaScenariu={seteazaScenariu}
-        onRevinoLaNormal={revinoLaNormal}
-      />
 
       {soc.conectat && <EvenimenteRecente soc={soc} />}
     </section>

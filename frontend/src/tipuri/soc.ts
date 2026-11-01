@@ -145,6 +145,10 @@ export type DetaliiIncidentSoc = IncidentSoc & {
 
 /** Raportul de activitate generat de SOC (GET /api/report). */
 export type RaportSoc = {
+  filters?: { start: string | null; end: string | null }
+  continut?: 'toate' | 'incidente' | 'dispozitive'
+  interval_selectat?: { deLa: string; panaLa: string }
+  devices?: RaportSoc['devices_at_risk']
   generated_at: string
   period: { first_event: string | null; last_event: string | null }
   summary: string

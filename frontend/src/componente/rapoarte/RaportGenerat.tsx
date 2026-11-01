@@ -11,9 +11,13 @@ import { Insigna, StareGoala } from '../comune/ElementeSoc'
 /** Conținutul raportului de activitate calculat de SOC (GET /api/report). */
 export function RaportGenerat({ raport }: { raport: RaportSoc }) {
   const total = raport.totals
+  const continut = raport.continut ?? 'toate'
+  const dispozitive = raport.devices ?? raport.devices_at_risk
 
   return (
     <div className="raport" aria-live="polite">
+      {raport.interval_selectat && <p className="raport__nota">Interval selectat: {raport.interval_selectat.deLa} – {raport.interval_selectat.panaLa} (inclusiv)</p>}
+      {continut === 'toate' && <>
       <p className="raport__rezumat">{raport.summary}</p>
 
       <dl className="raport__totaluri">
@@ -44,6 +48,8 @@ export function RaportGenerat({ raport }: { raport: RaportSoc }) {
         reguli, {total.alerts_ml} din modele ML
       </p>
 
+      </>}
+      {continut !== 'dispozitive' && <>
       <h3 className="raport__titlu">Incidente</h3>
       {raport.incidents.length === 0 ? (
         <StareGoala mesaj="Nu au fost corelate incidente." />
@@ -83,13 +89,16 @@ export function RaportGenerat({ raport }: { raport: RaportSoc }) {
         </ul>
       )}
 
-      <h3 className="raport__titlu">Dispozitive la risc</h3>
-      {raport.devices_at_risk.length === 0 ? (
-        <StareGoala mesaj="Niciun dispozitiv la risc." />
+      </>}
+      {continut !== 'incidente' && <>
+      <h3 className="raport__titlu">Dispozitive cu activitate în interval</h3>
+      <p className="raport__nota">Stările și numărul alertelor deschise sunt cele curente, la generarea raportului.</p>
+      {dispozitive.length === 0 ? (
+        <StareGoala mesaj="Niciun dispozitiv cu activitate în interval." />
       ) : (
         <table className="tabel tabel--compact">
           <tbody>
-            {raport.devices_at_risk.map((dispozitiv) => (
+            {dispozitive.map((dispozitiv) => (
               <tr key={dispozitiv.device_id}>
                 <td className="tabel__monospatiat">{dispozitiv.device_id}</td>
                 <td>{dispozitiv.name}</td>
@@ -104,6 +113,7 @@ export function RaportGenerat({ raport }: { raport: RaportSoc }) {
           </tbody>
         </table>
       )}
+      </>}
     </div>
   )
 }

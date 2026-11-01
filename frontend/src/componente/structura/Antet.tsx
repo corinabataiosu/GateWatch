@@ -19,7 +19,6 @@ export function Antet({ socConectat, seIncarca }: ProprietatiAntet) {
         </span>
         <span className="antet__identitate">
           <span className="antet__titlu">GateWatch</span>
-          <span className="antet__subtitlu">Supraveghere aeroportuară</span>
         </span>
       </div>
 

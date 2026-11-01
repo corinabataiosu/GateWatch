@@ -1818,3 +1818,17 @@
   display: block;
   color: var(--text-secundar);
 }
+.raport-filtre {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  padding: 18px;
+  margin: 0 0 20px;
+  border: 1px solid var(--chenar);
+  border-radius: 10px;
+}
+.raport-filtre legend { padding: 0 8px; font-weight: 600; }
+.raport-filtre label { display: flex; flex-direction: column; gap: 8px; font-size: .85rem; }
+.raport-filtre input, .raport-filtre select { min-width: 0; padding: 10px; border: 1px solid var(--chenar); border-radius: 6px; font: inherit; background: white; color: inherit; }
+.raport-filtre p { grid-column: 1 / -1; margin: 0; }
+@media (max-width: 700px) { .raport-filtre { grid-template-columns: 1fr; } }

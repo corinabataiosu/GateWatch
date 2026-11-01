@@ -133,8 +133,11 @@ export function izoleazaDispozitiv(
 }
 
 /** Generează raportul de activitate pe baza datelor curente ale SOC. */
-export function genereazaRaport(): Promise<RaportSoc> {
-  return cerere<RaportSoc>('/api/report')
+export function genereazaRaport(start?: string, end?: string): Promise<RaportSoc> {
+  const params = new URLSearchParams()
+  if (start) params.set('start', start)
+  if (end) params.set('end', end)
+  return cerere<RaportSoc>(`/api/report?${params}`)
 }
 
 export function reseteazaSoc(): Promise<unknown> {

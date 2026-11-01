@@ -66,9 +66,25 @@ def test_video_alert_joins_existing_cam01_incident(client, sim, factory):
     client.app_state.ingestion.poll_once()
     incident_id = client.get("/api/incidents").json()[0]["incident_id"]
     seen_at = (factory.clock + timedelta(seconds=10)).isoformat()  # same clock as the CAM-01 events
-    for _ in range(3):
-        post(client, sample(True, captured_at=seen_at))
+    for index in range(3):
+        post(client, sample(True, captured_at=(datetime.fromisoformat(seen_at) + timedelta(seconds=index)).isoformat()))
     video_alert = next(a for a in client.get("/api/alerts").json() if a["rule_id"] == "GW-V01")
     assert video_alert["incident_id"] == incident_id
     detail = client.get(f"/api/incidents/{incident_id}").json()
     assert "Anomalie video (ML)" in detail["summary"]
+
+
+def test_gap_breaks_anomaly_streak(monkeypatch):
+    from app.video import VideoMonitor, VideoTelemetry
+    import app.video as video_module
+    clock = [0.0]
+    monkeypatch.setattr(video_module.time, 'monotonic', lambda: clock[0])
+    monitor = VideoMonitor()
+    telemetry = VideoTelemetry.model_validate(sample(True))
+    monitor.ingest(telemetry)
+    monitor.ingest(telemetry)
+    assert monitor.view('CAM-01')['image_state'] == 'atypical_sample'
+    clock[0] = 11.0
+    assert monitor.view('CAM-01')['image_state'] == 'unavailable'
+    draft, _ = monitor.ingest(telemetry)
+    assert draft is None and monitor.anomaly_streak['CAM-01'] == 1

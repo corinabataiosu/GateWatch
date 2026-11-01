@@ -30,7 +30,7 @@ def test_report_includes_response_actions(client, sim, factory):
     sim.events = factory.compromised_vendor()
     client.app_state.ingestion.poll_once()
     incident_id = client.get("/api/incidents").json()[0]["incident_id"]
-    client.post(f"/api/incidents/{incident_id}/actions", json={"action": "isolate_device", "device_id": "CAM-01"})
+    client.post(f"/api/incidents/{incident_id}/actions", headers={"X-Admin-Token": "gatewatch-admin"}, json={"action": "isolate_device", "device_id": "CAM-01"})
     actions = client.get("/api/report").json()["incidents"][0]["actions"]
     assert any(a["action"] == "isolate_device" and a["device_id"] == "CAM-01" for a in actions)
 

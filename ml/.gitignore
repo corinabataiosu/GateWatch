@@ -30,3 +30,4 @@ Thumbs.db
 # Camera-specific calibration stays on the capture laptop.
 models/video_camera.joblib
 models/video_camera_card.json
+models/video_camera.backup-*.joblib

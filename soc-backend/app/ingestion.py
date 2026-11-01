@@ -90,9 +90,10 @@ class IngestionEngine:
             return 0
 
     def _refresh_devices(self) -> None:
-        if time.monotonic() - self._last_device_poll >= self.settings.device_poll_interval or not self.devices:
-            self.devices = self.client.get("/sim/devices")
-            self._last_device_poll = time.monotonic()
+        with self.pipeline.lock:
+            if time.monotonic() - self._last_device_poll >= self.settings.device_poll_interval or not self.devices:
+                self.devices = self.client.get("/sim/devices")
+                self._last_device_poll = time.monotonic()
 
     def _drain(self, run_id: str) -> int:
         cursor = self.db.get_cursor(run_id)

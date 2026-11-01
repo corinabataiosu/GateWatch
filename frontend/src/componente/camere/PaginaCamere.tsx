@@ -14,6 +14,8 @@ import {
   StareGoala,
 } from '../comune/ElementeSoc'
 import { FluxCamera } from './FluxCamera'
+import { RestabilesteDispozitiv } from '../comune/RestabilesteDispozitiv'
+import { stareImagine } from '../../servicii/stareImagine'
 
 /** Singura cameră cu flux video în demonstrație. */
 const CAMERA_CU_FLUX = 'CAM-01'
@@ -43,8 +45,10 @@ export function PaginaCamere({ soc }: { soc: DateSoc }) {
                     <th scope="col">Adresă IP</th>
                     <th scope="col">Stare operațională</th>
                     <th scope="col">Stare securitate</th>
+                    <th scope="col">Stare imagine</th>
                     <th scope="col">Alerte deschise</th>
                     <th scope="col">Ultima activitate</th>
+                    <th scope="col">Administrare</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -67,8 +71,10 @@ export function PaginaCamere({ soc }: { soc: DateSoc }) {
                       <td>
                         <Insigna stare={stareSau(STARI_SECURITATE_SOC, camera.security_state)} />
                       </td>
+                      <td>{stareImagine(camera.video)}</td>
                       <td>{camera.open_alerts}</td>
                       <td>{formateazaDataOra(camera.last_seen)}</td>
+                      <td><RestabilesteDispozitiv id={camera.device_id} onRestabilit={soc.reimprospateaza} /></td>
                     </tr>
                   ))}
                 </tbody>

@@ -142,5 +142,5 @@ class Correlator:
     def set_status(self, incident_id: str, status: str) -> None:
         self.db.execute("UPDATE incidents SET status = ?, updated_at = ? WHERE incident_id = ?",
                         (status, now_iso(), incident_id))
-        alert_status = "closed" if status == "resolved" else "open"
-        self.db.execute("UPDATE alerts SET status = ? WHERE incident_id = ?", (alert_status, incident_id))
+        if status == "resolved":
+            self.db.execute("UPDATE alerts SET status = 'closed' WHERE incident_id = ?", (incident_id,))

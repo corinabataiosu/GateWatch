@@ -85,6 +85,8 @@ class FakeSimulator:
         if path.startswith("/sim/devices"):
             return [{**d, "status": "isolated" if d["device_id"] in self.isolated else d["status"]}
                     for d in DEVICES]
+        if path == "/sim/runs":
+            return [{"run_id": self.run_id, "last_seq": max((e["seq"] for e in self.events), default=0)}]
         if path.startswith("/sim/events"):
             query = dict(p.split("=") for p in path.split("?", 1)[1].split("&"))
             after, limit = int(query["after_seq"]), int(query["limit"])
@@ -96,6 +98,8 @@ class FakeSimulator:
         device_id = path.split("/")[3]
         if body["isolated"]:
             self.isolated.append(device_id)
+        elif device_id in self.isolated:
+            self.isolated.remove(device_id)
         return {"device_id": device_id, "status": "isolated"}
 
 

@@ -1,74 +1,15 @@
-import { useState } from 'react'
-import { EroareSoc, adresaRaportHtml, genereazaRaport } from '../../servicii/clientSoc'
 import {
   SEVERITATI_SOC,
   STARI_INCIDENT,
+  STARI_SECURITATE_SOC,
   formateazaDataOra,
   formateazaNumarIntreg,
 } from '../../servicii/formatare'
 import type { RaportSoc } from '../../tipuri/soc'
-import { Card, Insigna, StareGoala } from '../comune/ElementeSoc'
+import { Insigna, StareGoala } from '../comune/ElementeSoc'
 
-type StareGenerare =
-  | { tip: 'inactiv' }
-  | { tip: 'se-genereaza' }
-  | { tip: 'gata'; raport: RaportSoc }
-  | { tip: 'eroare'; mesaj: string }
-
-/**
- * Generează raportul de activitate al SOC și îl afișează.
- * Raportul este calculat de backend din alertele și incidentele detectate; aceeași
- * versiune poate fi descărcată ca document HTML tipăribil.
- */
-export function RaportGenerat({ conectat }: { conectat: boolean }) {
-  const [stare, setStare] = useState<StareGenerare>({ tip: 'inactiv' })
-
-  const genereaza = async () => {
-    setStare({ tip: 'se-genereaza' })
-    try {
-      setStare({ tip: 'gata', raport: await genereazaRaport() })
-    } catch (eroare) {
-      setStare({
-        tip: 'eroare',
-        mesaj: eroare instanceof EroareSoc ? eroare.message : 'Raportul nu a putut fi generat.',
-      })
-    }
-  }
-
-  return (
-    <Card titlu="Raport de activitate">
-      <div className="bara-actiuni">
-        <button
-          type="button"
-          className="buton-actiune"
-          onClick={genereaza}
-          disabled={!conectat || stare.tip === 'se-genereaza'}
-        >
-          {stare.tip === 'se-genereaza' ? 'Se generează...' : 'Generează raport'}
-        </button>
-        {stare.tip === 'gata' && (
-          <a className="buton-actiune buton-actiune--secundar" href={adresaRaportHtml()} download>
-            Descarcă raport (HTML)
-          </a>
-        )}
-        {stare.tip === 'gata' && (
-          <span className="tabel__secundar">
-            Generat la {formateazaDataOra(stare.raport.generated_at)}
-          </span>
-        )}
-      </div>
-
-      {stare.tip === 'eroare' && (
-        <p className="raport__eroare" role="alert">
-          {stare.mesaj}
-        </p>
-      )}
-      {stare.tip === 'gata' && <ContinutRaport raport={stare.raport} />}
-    </Card>
-  )
-}
-
-function ContinutRaport({ raport }: { raport: RaportSoc }) {
+/** Conținutul raportului de activitate calculat de SOC (GET /api/report). */
+export function RaportGenerat({ raport }: { raport: RaportSoc }) {
   const total = raport.totals
 
   return (
@@ -142,6 +83,27 @@ function ContinutRaport({ raport }: { raport: RaportSoc }) {
         </ul>
       )}
 
+      <h3 className="raport__titlu">Dispozitive la risc</h3>
+      {raport.devices_at_risk.length === 0 ? (
+        <StareGoala mesaj="Niciun dispozitiv la risc." />
+      ) : (
+        <table className="tabel tabel--compact">
+          <tbody>
+            {raport.devices_at_risk.map((dispozitiv) => (
+              <tr key={dispozitiv.device_id}>
+                <td className="tabel__monospatiat">{dispozitiv.device_id}</td>
+                <td>{dispozitiv.name}</td>
+                <td>
+                  <Insigna stare={STARI_SECURITATE_SOC[dispozitiv.security_state]} />
+                </td>
+                <td className="tabel__numar">
+                  {formateazaNumarIntreg(dispozitiv.open_alerts)} alerte deschise
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   )
 }

@@ -49,6 +49,29 @@ def test_simulator_down_reports_disconnected(client, sim):
     assert status["connected"] is False and "refused" in status["error"]
 
 
+def test_backlog_is_bounded_and_devices_available_before_processing(client, sim, factory, monkeypatch):
+    engine = client.app_state.ingestion
+    engine.settings.max_pages_per_poll = 1
+    sim.events = [factory.make("CAM-02", "heartbeat", "info") for _ in range(12)]
+    original = engine.pipeline.process
+
+    def process(events):
+        assert len(engine.devices) == 15
+        assert engine.status["connected"]
+        return original(events)
+
+    monkeypatch.setattr(engine.pipeline, "process", process)
+    assert ingest(client) == 5
+    assert engine.status["catching_up"]
+    assert engine.status["last_seq"] == 5
+    assert engine.status["events_ingested"] == 5
+    assert ingest(client) == 5
+    assert ingest(client) == 2
+    assert not engine.status["catching_up"]
+    assert engine.status["last_seq"] == 12
+    assert engine.status["events_ingested"] == 12
+
+
 # -- detection & correlation -------------------------------------------------
 
 def test_compromised_vendor_scenario_end_to_end(client, sim, factory):

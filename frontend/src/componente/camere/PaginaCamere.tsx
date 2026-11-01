@@ -15,6 +15,7 @@ import {
 } from '../comune/ElementeSoc'
 import { FluxCamera } from './FluxCamera'
 import { rezolvaAvertizareCamera } from '../../servicii/clientSoc'
+import { stareImagine } from '../../servicii/stareImagine'
 
 /** Singura cameră cu flux video în demonstrație. */
 const CAMERA_CU_FLUX = 'CAM-01'

@@ -1,4 +1,4 @@
-﻿import { OrbitControls } from '@react-three/drei'
+import { OrbitControls } from '@react-three/drei'
 import { useThree } from '@react-three/fiber'
 import { useEffect } from 'react'
 import {
@@ -24,25 +24,69 @@ type Pozitie3D = [number, number, number]
 const DIRECTIE_VIZUALIZARE = new Vector3(24, 52, 28).normalize()
 
 const CULORI = {
-  sol: '#eef2f7',
-  pista: '#5f6e80',
-  caiRulare: '#9aa6b4',
-  platforma: '#ccd3dc',
-  delimitare: '#a9b3c0',
-  drumServiciu: '#bfc7d2',
-  cladire: '#f7f9fc',
-  cladireSecundara: '#e9eef5',
-  acoperis: '#d3dbe5',
-  baza: '#b6c0cd',
+  sol: '#b9c79c',
+  pista: '#55585c',
+  caiRulare: '#9c9b95',
+  platforma: '#d4d1c9',
+  delimitare: '#aeaaa1',
+  drumServiciu: '#c6c2b9',
+  cladire: '#f6f4ef',
+  cladireSecundara: '#ebe8e1',
+  acoperis: '#d6d2c9',
+  baza: '#bdb8ad',
   geam: '#7e9dae',
   geamInchis: '#5c7889',
   intrare: '#4d6474',
   marcaj: '#fbfdff',
   marcajGalben: '#d2a63f',
-  detaliu: '#b8c3d2',
+  detaliu: '#c2bdb3',
   aeronava: '#fbfcfe',
-  aeronavaDetaliu: '#dbe3ec',
-  antena: '#8a99aa',
+  aeronavaDetaliu: '#e2ded6',
+  antena: '#8f8b83',
+}
+
+/** Fâșii de copaci pe terenul liber din jurul aeroportului; poziții fixe, cu variație deterministă. */
+const ZONE_COPACI: { x: [number, number]; z: [number, number]; numar: number }[] = [
+  { x: [-31, 11], z: [-22, -16.5], numar: 22 },
+  { x: [-24, 24], z: [18, 22], numar: 20 },
+  { x: [-33, -29], z: [-1, 10], numar: 6 },
+  { x: [28.5, 33], z: [-2, 10], numar: 6 },
+]
+
+function aleator(samanta: number): number {
+  const v = Math.sin(samanta * 127.1) * 43758.5453
+  return v - Math.floor(v)
+}
+
+const COPACI = ZONE_COPACI.flatMap((zona, indexZona) =>
+  Array.from({ length: zona.numar }, (_, i) => {
+    const s = indexZona * 100 + i
+    return {
+      x: zona.x[0] + aleator(s + 0.1) * (zona.x[1] - zona.x[0]),
+      z: zona.z[0] + aleator(s + 0.7) * (zona.z[1] - zona.z[0]),
+      inaltime: 1.1 + aleator(s + 0.3) * 0.9,
+      nuanta: aleator(s + 0.9) > 0.5 ? '#6f8a5a' : '#7f9966',
+    }
+  }),
+)
+
+function Vegetatie() {
+  return (
+    <group>
+      {COPACI.map((copac, index) => (
+        <group key={index} position={[copac.x, 0, copac.z]}>
+          <mesh castShadow position={[0, 0.3, 0]}>
+            <cylinderGeometry args={[0.09, 0.12, 0.6, 6]} />
+            <meshStandardMaterial color="#8a7a66" roughness={0.9} />
+          </mesh>
+          <mesh castShadow position={[0, 0.55 + copac.inaltime / 2, 0]}>
+            <coneGeometry args={[0.55, copac.inaltime, 7]} />
+            <meshStandardMaterial color={copac.nuanta} roughness={0.85} flatShading />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  )
 }
 
 function PistaAterizare() {
@@ -678,7 +722,7 @@ export function ModelAeroport({
   return (
     <>
       <ambientLight intensity={0.55} />
-      <hemisphereLight args={['#ffffff', '#dfe6ef', 0.5]} />
+      <hemisphereLight args={['#ffffff', '#e6e2d8', 0.5]} />
       <directionalLight
         castShadow
         position={[34, 46, 30]}
@@ -706,6 +750,7 @@ export function ModelAeroport({
           <meshStandardMaterial color={CULORI.sol} roughness={0.98} />
         </mesh>
 
+        <Vegetatie />
         <PistaAterizare />
         <CaiDeRulare />
         <PlatformaAeronave />

@@ -133,7 +133,7 @@ export function ScenaAeroport({ stareCamera = null, dispozitiveSoc = [] }: Propr
         gl={{ antialias: true, alpha: false }}
         style={{ position: 'absolute', inset: 0 }}
         onCreated={({ gl }) => {
-          gl.setClearColor('#f4f7fa')
+          gl.setClearColor('#ecebe6')
           setScenaPregatita(true)
         }}
         fallback={
@@ -150,8 +150,14 @@ export function ScenaAeroport({ stareCamera = null, dispozitiveSoc = [] }: Propr
       </Canvas>
 
       <span className="scena-aeroport__eticheta">Model schematic al aeroportului</span>
+      <ul className="scena-aeroport__legenda" aria-label="Legendă">
+        <li><i className="punct punct--normal" />Normal</li>
+        <li><i className="punct punct--avertizare" />Avertizare</li>
+        <li><i className="punct punct--compromis" />Compromis</li>
+        <li><i className="punct punct--indisponibil" />Offline</li>
+      </ul>
       <span className="scena-aeroport__indiciu" aria-hidden="true">
-        Apasă pe eticheta unui dispozitiv pentru detalii
+        Trage pentru rotire · scroll pentru zoom · apasă pe o etichetă pentru detalii
       </span>
 
       {selectat && (

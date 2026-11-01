@@ -123,8 +123,6 @@ input[type="password"], input[type="number"] {
 .rezultat--failure { color: var(--alerta); font-weight: 600; }
 .rezultat--success { color: var(--bun); }
 
-/* Keep the application's restrained blue, white and slate workstation theme. */
-:root { --fundal: #f3f5f8; --text: #0f172a; --text-secundar: #51607a; --accent: #1d4ed8; --chenar: #e2e8f0; }
 .grila { max-width: 1600px; margin: auto; grid-template-columns: minmax(340px, 1.1fr) minmax(320px, 1fr); align-items: start; }
 .card--rulare, .card--scenariu { grid-column: 1 / -1; }
 .card--rulare .campuri { grid-template-columns: repeat(4, 1fr); }
@@ -161,3 +159,61 @@ legend { padding: 0 10px 0 0; font-size: .82rem; font-weight: 600; }
   .settings-grid, .card--rulare .campuri, .device-summary { grid-template-columns: 1fr 1fr; }
   .etapa { grid-template-columns: 26px 1fr; } .etapa__mitre { grid-column: 2; }
 }
+
+/* Tema GateWatch (aceeași ca în dashboard): hârtie, cerneală, etichete mono. */
+:root {
+  --fundal: #e8e5de; --suprafata: #f6f4ef; --chenar: #d9d4ca; --chenar-puternic: #c4beb2;
+  --text: #121212; --text-secundar: #57534c; --text-discret: #8a857b;
+  --accent: #121212; --bun: #56683a; --atentie: #a8771f; --alerta: #b3361f; --neutru: #8a857b;
+  --raza: 8px; --mono: 'Cascadia Mono', 'JetBrains Mono', Consolas, ui-monospace, monospace;
+  font-family: 'Inter', 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif;
+}
+body { background: var(--fundal); }
+.antet { background: var(--suprafata); border-bottom-color: var(--chenar); }
+.antet__logo { width: 34px; height: 34px; border-radius: 6px; background: #121212; color: #f6f4ef; }
+.antet__titlu { font-size: 1.0625rem; letter-spacing: -0.02em; }
+.antet__stare { display: flex; gap: 8px; }
+
+.card { border-color: var(--chenar); box-shadow: none; }
+.card--manual { border-top: 1px solid var(--chenar); }
+.card__titlu { font-size: .9375rem; font-weight: 650; letter-spacing: -0.01em; }
+
+.campuri dt, .tabel th, .etapa__mitre, .legenda, .execution-id, legend, .field > span {
+  font-family: var(--mono); font-size: .6875rem; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--text-discret);
+}
+.tabel th { background: var(--suprafata); border-bottom-color: var(--chenar-puternic); }
+.tabel td { border-bottom-color: #e6e2d9; font-family: var(--mono); font-size: .75rem; }
+.tabel tr.origine--scenario_generated td { background: #f3e3dc; }
+.tabel tr.origine--observed_http td { background: #f1e8d4; }
+.tabel-container { border-color: var(--chenar); border-radius: 6px; background: var(--suprafata); }
+
+.insigna { padding: 2px 8px; border: 1px solid currentColor; border-radius: 4px; background: transparent; font-family: var(--mono); font-size: .6875rem; font-weight: 500; letter-spacing: .04em; text-transform: uppercase; }
+.insigna--buna { background: transparent; color: var(--bun); }
+.insigna--alerta { background: transparent; color: var(--alerta); }
+.insigna--neutra { background: transparent; color: var(--neutru); }
+
+.buton { border-radius: 4px; border-color: var(--chenar-puternic); background: transparent; }
+.buton:hover { border-color: var(--text); background: #e2ded5; }
+.buton--principal { background: #121212; border-color: #121212; color: #f6f4ef; }
+.buton--principal:hover { background: #000; }
+.buton--pericol { color: var(--alerta); border-color: var(--alerta); }
+
+.field input, .field select, input[type="password"], input[type="number"] { border-color: var(--chenar-puternic); border-radius: 4px; background: #fbfaf7; }
+.device-summary, .traffic-preview { background: #efece6; border-left: 0; border: 1px solid var(--chenar); border-radius: 6px; }
+.traffic-preview { font-family: var(--mono); font-size: .75rem; }
+
+.zona rect { fill: #efece6; stroke: var(--chenar); rx: 6; }
+.zona text { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; fill: var(--text-discret); }
+.dispozitiv circle { stroke: var(--suprafata); }
+.dispozitiv text { font-family: var(--mono); font-size: 10px; }
+.dispozitiv--online circle, .punct--online { fill: #121212; background: #121212; }
+.dispozitiv--selected circle { stroke: var(--atentie); stroke-width: 4; }
+.dispozitiv--selected text { fill: var(--text); font-weight: 700; }
+.punct--activ { background: var(--suprafata); }
+
+.etapa { border-color: var(--chenar); border-radius: 6px; background: var(--suprafata); }
+.etapa__nr { border-radius: 4px; background: #e2ded5; font-family: var(--mono); }
+.etapa--urmatoare { border-color: #121212; }
+
+:focus-visible { outline: 2px solid #121212; outline-offset: 2px; }
+.device-summary:empty { display: none; }

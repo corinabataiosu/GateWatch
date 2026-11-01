@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Card } from '../comune/ElementeSoc'
 
 /** Fluxul MJPEG publicat de agentul video (ml/src/agent_video.py). */
@@ -16,8 +16,23 @@ export function FluxCamera({ identificator, deschis, onSchimba }: ProprietatiFlu
   // Cheia nouă la fiecare deschidere forțează reconectarea la flux.
   const [incercare, setIncercare] = useState(0)
 
-  const deschide = () => {
+  const [sePorneste, setSePorneste] = useState(false)
+  const pornireIncercata = useRef(false)
+
+  const deschide = async () => {
+    pornireIncercata.current = true
     setIndisponibil(false)
+    if (import.meta.env.DEV) {
+      // Serverul de dezvoltare pornește agentul video pe webcam dacă nu rulează deja.
+      setSePorneste(true)
+      try {
+        await fetch('/__agent-video/porneste', { method: 'POST' })
+      } catch {
+        // Dacă pornirea eșuează, imaginea de mai jos afișează starea „indisponibil”.
+      } finally {
+        setSePorneste(false)
+      }
+    }
     setIncercare((valoare) => valoare + 1)
     onSchimba(true)
   }
@@ -31,8 +46,8 @@ export function FluxCamera({ identificator, deschis, onSchimba }: ProprietatiFlu
             Închide fluxul
           </button>
         ) : (
-          <button type="button" className="buton-actiune" onClick={deschide}>
-            Vezi fluxul
+          <button type="button" className="buton-actiune" onClick={deschide} disabled={sePorneste}>
+            {sePorneste ? 'Se pornește camera...' : 'Vezi fluxul'}
           </button>
         )
       }
@@ -45,7 +60,7 @@ export function FluxCamera({ identificator, deschis, onSchimba }: ProprietatiFlu
         <div className="flux-camera__indisponibil" role="status">
           <p>Fluxul video nu este disponibil.</p>
           <p className="flux-camera__nota">
-            Pornește agentul video: <code>python ml/src/agent_video.py</code>
+            Verifică dacă webcam-ul nu e folosit de altă aplicație, apoi reîncearcă.
           </p>
           <button type="button" className="buton-actiune" onClick={deschide}>
             Reîncearcă
@@ -58,7 +73,14 @@ export function FluxCamera({ identificator, deschis, onSchimba }: ProprietatiFlu
             className="flux-camera__imagine"
             src={`${ADRESA_FLUX}?t=${incercare}`}
             alt={`Imagine live de la camera ${identificator}`}
-            onError={() => setIndisponibil(true)}
+            onError={() => {
+              // Deschis din tabel, fără pornire: se încearcă o dată pornirea camerei.
+              if (import.meta.env.DEV && !pornireIncercata.current) {
+                void deschide()
+              } else {
+                setIndisponibil(true)
+              }
+            }}
           />
           <span className="flux-camera__live">LIVE</span>
         </div>

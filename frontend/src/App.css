@@ -51,14 +51,16 @@
   display: grid;
   place-items: center;
   flex: none;
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
+  display: inline-flex;
+  gap: 6px;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 8px;
   background-color: var(--accent);
-  color: #ffffff;
+  color: #f5f3ee;
   font-size: 0.8125rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
 }
 
 .antet__identitate {
@@ -94,7 +96,7 @@
   align-items: center;
   gap: 8px;
   padding: 7px 12px;
-  border: 1px solid #c7d7f7;
+  border: 1px solid #d9d5cb;
   border-radius: 999px;
   background-color: var(--accent-soft);
   color: var(--accent-puternic);
@@ -108,7 +110,7 @@
   height: 8px;
   border-radius: 50%;
   background-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
+  box-shadow: 0 0 0 3px rgba(44, 95, 107, 0.12);
 }
 
 /* Structura principală */
@@ -171,12 +173,12 @@
 }
 
 .meniu-lateral__buton:hover {
-  background-color: #eef2f7;
+  background-color: #eeece6;
   color: var(--text-principal);
 }
 
 .meniu-lateral__buton--activ {
-  border-color: #d3e0fb;
+  border-color: #d9d5cb;
   background-color: var(--accent-soft);
   color: var(--accent-puternic);
 }
@@ -215,7 +217,7 @@
 }
 
 .meniu-lateral__buton--activ .meniu-lateral__descriere {
-  color: #3b5bab;
+  color: #2c5f6b;
 }
 
 /* Zona de conținut */
@@ -227,7 +229,7 @@
 }
 
 .continut-principal:focus-visible {
-  outline: 3px solid rgba(29, 78, 216, 0.55);
+  outline: 3px solid rgba(44, 95, 107, 0.55);
   outline-offset: -3px;
 }
 
@@ -275,7 +277,7 @@
 .spatiu-3d {
   display: flex;
   flex-direction: column;
-  min-height: clamp(360px, 62vh, 680px);
+  min-height: clamp(420px, calc(100vh - 230px), 860px);
   overflow: hidden;
   background-color: var(--fundal-suprafata);
   border: 1px solid var(--chenar);
@@ -289,7 +291,7 @@
   justify-content: space-between;
   gap: 12px;
   padding: 14px 20px;
-  background-color: #fcfdff;
+  background-color: #faf9f6;
   border-bottom: 1px solid var(--chenar);
 }
 
@@ -307,7 +309,7 @@
   gap: 6px;
   padding: 4px 10px;
   border-radius: 999px;
-  background-color: #f1f5f9;
+  background-color: #efede7;
   color: var(--text-secundar);
   font-size: 0.75rem;
   font-weight: 600;
@@ -322,12 +324,12 @@
 }
 
 .spatiu-3d__stare--activ {
-  background-color: #e7f6ee;
-  color: #16794a;
+  background-color: #e4ecec;
+  color: #1f4a54;
 }
 
 .spatiu-3d__stare--activ::before {
-  background-color: #1f9d63;
+  background-color: #2c5f6b;
 }
 
 .scena-aeroport {
@@ -335,7 +337,7 @@
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  background-image: linear-gradient(180deg, #fafcfe 0%, #e9eef6 100%);
+  background-color: #ecebe6;
   touch-action: none;
 }
 
@@ -345,7 +347,7 @@
   left: 16px;
   z-index: 2;
   padding: 5px 10px;
-  border: 1px solid rgba(148, 163, 184, 0.4);
+  border: 1px solid rgba(120, 114, 104, 0.25);
   border-radius: 999px;
   background-color: rgba(255, 255, 255, 0.86);
   color: var(--text-secundar);
@@ -378,7 +380,7 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  background-color: #f2f6fb;
+  background-color: #f3f1ec;
   color: var(--text-secundar);
   font-size: 0.875rem;
 }
@@ -386,7 +388,7 @@
 .scena-aeroport__spinner {
   width: 26px;
   height: 26px;
-  border: 3px solid rgba(29, 78, 216, 0.18);
+  border: 3px solid rgba(44, 95, 107, 0.18);
   border-top-color: var(--accent);
   border-radius: 50%;
   animation: rotire-incarcare 0.8s linear infinite;
@@ -399,7 +401,7 @@
   width: 100%;
   height: 100%;
   padding: 24px;
-  background-color: #f2f6fb;
+  background-color: #f3f1ec;
   color: var(--text-secundar);
   text-align: center;
 }
@@ -409,11 +411,11 @@
 .marker-camera__eticheta {
   display: inline-block;
   padding: 2px 8px;
-  border: 1px solid rgba(63, 120, 168, 0.45);
+  border: 1px solid rgba(44, 95, 107, 0.45);
   border-radius: 999px;
   background-color: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 1px 3px rgba(15, 40, 70, 0.12);
-  color: #2f6c9e;
+  box-shadow: 0 1px 3px rgba(17, 17, 17, 0.12);
+  color: #2c5f6b;
   font: inherit;
   font-size: 0.6875rem;
   font-weight: 700;
@@ -428,8 +430,8 @@
 }
 
 .marker-camera__eticheta--activ {
-  border-color: rgba(47, 108, 158, 0.8);
-  background-color: #eef5fb;
+  border-color: rgba(44, 95, 107, 0.8);
+  background-color: #eeece6;
 }
 
 /* Eticheta preia culoarea stării, ca dispozitivul să rămână lizibil și când eticheta îl acoperă. */
@@ -446,9 +448,9 @@
 }
 
 .marker-camera__eticheta--indisponibil {
-  border-color: rgba(107, 119, 135, 0.6);
-  background-color: #f1f3f6;
-  color: #6b7787;
+  border-color: rgba(119, 115, 108, 0.6);
+  background-color: #eeece7;
+  color: #77736c;
 }
 
 .marker-camera__panou {
@@ -499,7 +501,7 @@
 }
 
 .marker-camera__panou-inchide:hover {
-  background-color: #eef2f8;
+  background-color: #eeece6;
   color: var(--text-secundar);
 }
 
@@ -558,7 +560,7 @@
   display: inline-flex;
   padding: 4px 10px;
   border-radius: 999px;
-  background-color: #f1f5f9;
+  background-color: #efede7;
   color: var(--text-secundar);
   font-size: 0.75rem;
   font-weight: 600;
@@ -636,8 +638,12 @@
   }
 
   .antet__logo {
-    width: 34px;
     height: 34px;
+    padding: 0 8px;
+  }
+
+  .antet__logo-text {
+    display: none;
   }
 
   .antet__subtitlu {
@@ -729,10 +735,10 @@
 /* Panou stare cameră */
 
 .panou-stare-camera {
-  --stare-buna: #1d4ed8;
-  --stare-atentie: #b45309;
-  --stare-alerta: #b42318;
-  --stare-neutra: #64748b;
+  --stare-buna: #56683a;
+  --stare-atentie: #a8771f;
+  --stare-alerta: #b3361f;
+  --stare-neutra: #8a857b;
 
   display: flex;
   flex-direction: column;
@@ -806,19 +812,19 @@
 
 .insigna-demonstrativa {
   background-color: var(--accent-soft);
-  border-color: #c7d7f7;
+  border-color: #d9d5cb;
   color: var(--accent-puternic);
 }
 
 .insigna-scenariu {
-  background-color: #f1f5f9;
+  background-color: #efede7;
   border-color: var(--chenar);
   color: var(--text-secundar);
 }
 
 .insigna-scenariu--buna {
   background-color: var(--accent-soft);
-  border-color: #c7d7f7;
+  border-color: #d9d5cb;
   color: var(--accent-puternic);
 }
 
@@ -839,7 +845,7 @@
   padding: 10px 14px;
   border: 1px solid var(--chenar);
   border-radius: 10px;
-  background-color: #f8fafc;
+  background-color: #f7f6f2;
   font-size: 0.875rem;
   line-height: 1.5;
   color: var(--text-secundar);
@@ -859,7 +865,7 @@
   padding: 14px 16px;
   border: 1px solid var(--chenar);
   border-radius: 12px;
-  background-color: #f8fafc;
+  background-color: #f7f6f2;
 }
 
 .indicator-camera__eticheta {
@@ -946,7 +952,7 @@
   height: 22px;
   padding: 0 7px;
   border-radius: 999px;
-  background-color: #f1f5f9;
+  background-color: #efede7;
   color: var(--text-secundar);
   font-size: 0.75rem;
   font-weight: 700;
@@ -1031,19 +1037,19 @@
 }
 
 .buton-scenariu:hover {
-  border-color: #94a3b8;
-  background-color: #f1f5f9;
+  border-color: #a8a398;
+  background-color: #efede7;
   color: var(--text-principal);
 }
 
 .buton-scenariu--activ {
-  border-color: #c7d7f7;
+  border-color: #d9d5cb;
   background-color: var(--accent-soft);
   color: var(--accent-puternic);
 }
 
 .buton-scenariu--activ:hover {
-  border-color: #c7d7f7;
+  border-color: #d9d5cb;
   background-color: var(--accent-soft);
   color: var(--accent-puternic);
 }
@@ -1063,24 +1069,20 @@
   gap: 6px;
   padding: 14px 16px;
   border: 1px solid var(--chenar);
-  border-left: 4px solid var(--stare-neutra);
   border-radius: 10px;
   background-color: var(--fundal-suprafata);
 }
 
 .alerta-camera--alerta {
-  border-left-color: var(--stare-alerta);
-  background-color: #fffbfa;
+  background-color: #faf9f6;
 }
 
 .alerta-camera--atentie {
-  border-left-color: var(--stare-atentie);
-  background-color: #fffdf7;
+  background-color: #faf9f6;
 }
 
 .alerta-camera--neutra {
-  border-left-color: var(--stare-neutra);
-  background-color: #f8fafc;
+  background-color: #f7f6f2;
 }
 
 .alerta-camera__antet {
@@ -1111,7 +1113,7 @@
 }
 
 .alerta-camera__severitate--neutra {
-  background-color: #f1f5f9;
+  background-color: #efede7;
   color: var(--text-secundar);
 }
 
@@ -1148,7 +1150,7 @@
   padding: 14px 16px;
   border: 1px dashed var(--chenar-puternic);
   border-radius: 10px;
-  background-color: #f8fafc;
+  background-color: #f7f6f2;
   font-size: 0.875rem;
   line-height: 1.5;
   color: var(--text-secundar);
@@ -1213,14 +1215,14 @@
 /* Indicator conexiune SOC (antet) */
 
 .indicator-demonstrativ--conectat {
-  border-color: #bbf7d0;
-  background-color: #f0fdf4;
-  color: #166534;
+  border-color: #c9d9dc;
+  background-color: #eef3f3;
+  color: #1f4a54;
 }
 
 .indicator-demonstrativ--conectat .indicator-demonstrativ__punct {
-  background-color: #16a34a;
-  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.14);
+  background-color: #2c5f6b;
+  box-shadow: 0 0 0 3px rgba(44, 95, 107, 0.14);
 }
 
 .indicator-demonstrativ--deconectat {
@@ -1236,12 +1238,12 @@
 
 .indicator-demonstrativ--asteptare {
   border-color: var(--chenar);
-  background-color: #f8fafc;
+  background-color: #f7f6f2;
   color: var(--text-secundar);
 }
 
 .indicator-demonstrativ--asteptare .indicator-demonstrativ__punct {
-  background-color: #94a3b8;
+  background-color: #a8a398;
   box-shadow: none;
 }
 
@@ -1296,7 +1298,7 @@
   padding: 2px 9px;
   border: 1px solid var(--chenar);
   border-radius: 999px;
-  background-color: #f1f5f9;
+  background-color: #efede7;
   color: var(--text-secundar);
   font-size: 0.75rem;
   font-weight: 600;
@@ -1305,7 +1307,7 @@
 }
 
 .insigna--buna {
-  border-color: #c7d7f7;
+  border-color: #d9d5cb;
   background-color: var(--accent-soft);
   color: var(--accent-puternic);
 }
@@ -1475,7 +1477,7 @@
 .tabel th {
   position: sticky;
   top: 0;
-  background-color: #f8fafc;
+  background-color: #f7f6f2;
   font-size: 0.75rem;
   font-weight: 700;
   color: var(--text-secundar);
@@ -1552,7 +1554,7 @@
   margin: 0;
   padding: 8px 12px;
   border-radius: var(--raza-mica);
-  background-color: #f8fafc;
+  background-color: #f7f6f2;
   font-size: 0.875rem;
   color: var(--text-secundar);
 }
@@ -1764,7 +1766,7 @@
   position: relative;
   overflow: hidden;
   border-radius: var(--raza-mica);
-  background-color: #0f1720;
+  background-color: #111111;
   aspect-ratio: 4 / 3;
   max-width: 640px;
 }
@@ -1818,3 +1820,178 @@
   display: block;
   color: var(--text-secundar);
 }
+
+/* Legendă și indicii de vizualizare pentru scena 3D */
+
+.scena-aeroport__legenda {
+  position: absolute;
+  z-index: 2;
+  margin: 0;
+  padding: 6px 10px;
+  border: 1px solid var(--chenar);
+  border-radius: 8px;
+  background-color: rgba(252, 251, 248, 0.9);
+  color: var(--text-secundar);
+  font-size: 0.6875rem;
+}
+
+.scena-aeroport__legenda {
+  bottom: 14px;
+  left: 16px;
+  display: flex;
+  gap: 12px;
+  list-style: none;
+}
+
+.scena-aeroport__legenda li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.punct {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.punct--normal { background-color: #2c5f6b; }
+.punct--avertizare { background-color: #c08a1e; }
+.punct--compromis { background-color: #b04a3f; }
+.punct--indisponibil { background-color: #8a99aa; }
+
+h1, h2, h3, .card__titlu, .pagina__titlu, .antet__titlu {
+  letter-spacing: -0.015em;
+}
+
+/* ========================================================
+   Tema GateWatch: hârtie, cerneală, etichete mono.
+   Stările folosesc doar oliv (ok), ocru (avertizare), ruginiu (alertă).
+   ======================================================== */
+
+.antet { min-height: 58px; background-color: var(--fundal-suprafata); border-bottom-color: var(--chenar); }
+.antet__logo { width: 34px; height: 34px; padding: 0; justify-content: center; border-radius: 6px; background-color: #121212; color: #f6f4ef; }
+.antet__titlu { font-size: 1.0625rem; font-weight: 700; letter-spacing: -0.02em; }
+
+.meniu-lateral { background-color: var(--fundal-lateral); }
+.meniu-lateral__titlu,
+.pagina__eticheta,
+.spatiu-3d__eticheta,
+.scena-aeroport__eticheta {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-discret);
+}
+.meniu-lateral__buton { border: 0; border-radius: 6px; }
+.meniu-lateral__buton:hover { background-color: var(--accent-soft); color: var(--text-principal); }
+.meniu-lateral__buton--activ,
+.meniu-lateral__buton--activ:hover { background-color: #121212; color: #f6f4ef; }
+.meniu-lateral__buton--activ .meniu-lateral__descriere { color: #b9b3a8; }
+
+.card,
+.indicator-soc,
+.spatiu-3d,
+.mesaj-soc {
+  border: 1px solid var(--chenar);
+  border-radius: var(--raza-mare);
+  box-shadow: none;
+}
+.card__titlu { font-size: 0.9375rem; font-weight: 650; letter-spacing: -0.01em; }
+
+.indicator-soc__eticheta {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-discret);
+}
+.indicator-soc__valoare,
+.raport__totaluri dd { font-family: var(--mono); font-size: 1.75rem; font-weight: 500; letter-spacing: -0.03em; }
+
+.tabel th {
+  background-color: transparent;
+  border-bottom-color: var(--chenar-puternic);
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-discret);
+}
+.tabel__monospatiat,
+.tabel__numar { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+.insigna,
+.insigna-scenariu,
+.insigna-demonstrativa,
+.spatiu-3d__stare,
+.indicator-demonstrativ {
+  gap: 6px;
+  padding: 2px 8px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  background-color: transparent;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secundar);
+}
+.insigna--buna, .insigna-scenariu--buna, .indicator-demonstrativ--conectat, .spatiu-3d__stare--activ { color: var(--ok); background-color: transparent; }
+.insigna--atentie, .insigna-scenariu--atentie, .indicator-demonstrativ--asteptare { color: var(--avertizare); background-color: transparent; }
+.insigna--alerta, .insigna-scenariu--alerta, .indicator-demonstrativ--deconectat { color: var(--alerta); background-color: transparent; }
+.indicator-demonstrativ { padding: 5px 10px; }
+.spatiu-3d__stare::before,
+.spatiu-3d__stare--activ::before,
+.indicator-demonstrativ__punct { background-color: currentColor; box-shadow: none; }
+
+.buton-actiune,
+.buton-scenariu { border-radius: 4px; font-weight: 600; letter-spacing: 0.01em; }
+.buton-actiune--secundar { border-color: var(--chenar-puternic); background-color: transparent; color: var(--text-principal); }
+.buton-actiune--secundar:hover:not(:disabled) { background-color: var(--accent-soft); }
+
+.stare-goala { padding: 18px 0; border: 0; text-align: left; color: var(--text-discret); }
+
+.anunt-mod-demonstrativ {
+  border: 1px solid var(--avertizare);
+  border-radius: var(--raza);
+  background-color: transparent;
+  color: var(--text-principal);
+}
+.anunt-mod-demonstrativ strong { color: var(--avertizare); }
+
+.scena-aeroport__eticheta,
+.scena-aeroport__legenda,
+.scena-aeroport__indiciu {
+  padding: 5px 9px;
+  border: 1px solid var(--chenar);
+  border-radius: 4px;
+  background-color: rgba(246, 244, 239, 0.92);
+  box-shadow: none;
+}
+.scena-aeroport__legenda,
+.scena-aeroport__indiciu { font-family: var(--mono); font-size: 0.6875rem; color: var(--text-secundar); }
+.punct--normal { background-color: #121212; }
+.punct--avertizare { background-color: var(--avertizare); }
+.punct--compromis { background-color: var(--alerta); }
+.punct--indisponibil { background-color: #a8a398; }
+
+.marker-camera__eticheta {
+  border: 1px solid #121212;
+  border-radius: 3px;
+  background-color: #f6f4ef;
+  box-shadow: none;
+  color: #121212;
+  font-family: var(--mono);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.marker-camera__eticheta--avertizare { border-color: var(--avertizare); color: var(--avertizare); }
+.marker-camera__eticheta--compromis { border-color: var(--alerta); background-color: var(--alerta); color: #f6f4ef; }
+.marker-camera__eticheta--indisponibil { border-color: #a8a398; color: #8a857b; }
+.marker-camera__eticheta--activ { background-color: #121212; color: #f6f4ef; }
+.marker-camera__panou { border: 1px solid var(--chenar-puternic); border-radius: var(--raza-mare); background-color: var(--fundal-suprafata); box-shadow: none; }

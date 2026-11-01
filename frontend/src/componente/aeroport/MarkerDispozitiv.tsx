@@ -14,9 +14,9 @@ type PaletaStare = {
 
 // Albastru (normal), chihlimbar (avertizare), roșu (compromis), gri (offline / izolat).
 const PALETE_STARE: Record<StareVizuala, PaletaStare> = {
-  normal: { inel: '#6d94b8', corp: '#3f78a8', activ: '#2f6c9e' },
-  avertizare: { inel: '#d0a24a', corp: '#c08a1e', activ: '#9c6f14' },
-  compromis: { inel: '#c0564a', corp: '#b04a3f', activ: '#8f3831' },
+  normal: { inel: '#6b675f', corp: '#1d1d1d', activ: '#000000' },
+  avertizare: { inel: '#c79b4f', corp: '#a8771f', activ: '#865e17' },
+  compromis: { inel: '#c65a45', corp: '#b3361f', activ: '#8f2a18' },
   indisponibil: { inel: '#a9b3c0', corp: '#8a99aa', activ: '#6b7787' },
 }
 

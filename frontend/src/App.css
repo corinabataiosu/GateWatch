@@ -1652,6 +1652,67 @@
 
 /* Raport generat */
 
+.raport-filtre {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  gap: 16px;
+  min-width: 0;
+  margin: 0 0 20px;
+  padding: 16px 20px 20px;
+  border: 1px solid var(--chenar);
+  border-radius: var(--raza);
+  background-color: var(--fundal-lateral);
+}
+
+.raport-filtre legend {
+  padding: 0 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-secundar);
+}
+
+.raport-filtre label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secundar);
+}
+
+.raport-filtre input,
+.raport-filtre select {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--chenar-puternic);
+  border-radius: var(--raza-mica);
+  background-color: var(--fundal-suprafata);
+  color: var(--text-principal);
+  font: inherit;
+  font-weight: 400;
+}
+
+.raport-filtre input:focus-visible,
+.raport-filtre select:focus-visible {
+  border-color: var(--accent-rece);
+}
+
+.raport-filtre:disabled input,
+.raport-filtre:disabled select {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.raport-filtre [role='alert'] {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--alerta);
+  font-size: 0.8125rem;
+}
+
 .buton-actiune--secundar {
   background-color: var(--fundal-suprafata);
   color: var(--accent);

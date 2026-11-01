@@ -47,6 +47,7 @@ export type DispozitivSoc = {
   operational_status: StareOperationalaSoc
   security_state: StareSecuritateSoc
   open_alerts: number
+  standalone_alerts?: number
   last_seen: string | null
   /** Ultimul scor Isolation Forest calculat de SOC pe evenimentele dispozitivului. */
   ml: ScorMlSoc | null

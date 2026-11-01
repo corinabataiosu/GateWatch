@@ -108,6 +108,10 @@ export function obtineIncidente(): Promise<IncidentSoc[]> {
   return cerere('/api/incidents')
 }
 
+export function rezolvaAvertizareCamera(id: string): Promise<{ closed_alerts: number }> {
+  return cerere(`/api/devices/${encodeURIComponent(id)}/resolve-warning`, { method: 'POST' })
+}
+
 export function obtineDetaliiIncident(id: string): Promise<DetaliiIncidentSoc> {
   return cerere(`/api/incidents/${encodeURIComponent(id)}`)
 }

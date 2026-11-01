@@ -10,7 +10,6 @@ import {
   formateazaNumarIntreg,
 } from '../../servicii/formatare'
 import { descarcaPdfRaport } from '../../servicii/serviciuPdf'
-import { incarcaRapoarte, salveazaRaport, stergeRaport } from '../../servicii/serviciuRapoarte'
 import type { RaportSoc } from '../../tipuri/soc'
 import {
   Card,
@@ -21,7 +20,12 @@ import {
 import { RaportGenerat } from './RaportGenerat'
 
 function descarcaJson(raport: RaportSoc) {
-  const blob = new Blob([JSON.stringify(raport, null, 2)], { type: 'application/json' })
+  const dateExport = raport.continut === 'incidente'
+    ? { generated_at: raport.generated_at, filters: raport.filters, interval_selectat: raport.interval_selectat, incidents: raport.incidents }
+    : raport.continut === 'dispozitive'
+      ? { generated_at: raport.generated_at, filters: raport.filters, interval_selectat: raport.interval_selectat, nota: 'Stările dispozitivelor sunt cele curente la generare.', devices: raport.devices }
+      : raport
+  const blob = new Blob([JSON.stringify(dateExport, null, 2)], { type: 'application/json' })
   const adresa = URL.createObjectURL(blob)
   const legatura = document.createElement('a')
   legatura.href = adresa
@@ -46,32 +50,29 @@ function TabelNumarare({ randuri }: { randuri: { cheie: string; eticheta: ReactN
 }
 
 export function PaginaRapoarte({ soc }: { soc: DateSoc }) {
-  const [rapoarte, setRapoarte] = useState<RaportSoc[]>(incarcaRapoarte)
-  const [selectat, setSelectat] = useState<RaportSoc | null>(() => rapoarte[0] ?? null)
+  const [selectat, setSelectat] = useState<RaportSoc | null>(null)
+  const [deLa, setDeLa] = useState('')
+  const [panaLa, setPanaLa] = useState('')
+  const [continut, setContinut] = useState<'toate' | 'incidente' | 'dispozitive'>('toate')
+  const intervalInvalid = !deLa || !panaLa || deLa > panaLa
   const [seGenereaza, setSeGenereaza] = useState(false)
   const [eroare, setEroare] = useState<string | null>(null)
 
   const genereaza = async () => {
+    if (intervalInvalid || seGenereaza) return
     setSeGenereaza(true)
     setEroare(null)
     try {
-      const raport = await genereazaRaport()
-      setRapoarte(salveazaRaport(raport))
-      setSelectat(raport)
+      const inceput = new Date(deLa + 'T00:00:00')
+      const sfarsit = new Date(panaLa + 'T00:00:00')
+      sfarsit.setDate(sfarsit.getDate() + 1)
+      const raport = await genereazaRaport(inceput.toISOString(), sfarsit.toISOString())
+      if (!raport.filters) throw new Error('Repornește backendul SOC pentru a activa filtrarea rapoartelor.')
+      setSelectat({ ...raport, continut, interval_selectat: { deLa, panaLa } })
     } catch (e) {
-      setEroare(e instanceof EroareSoc ? e.message : 'Raportul nu a putut fi generat.')
+      setEroare(e instanceof Error || e instanceof EroareSoc ? e.message : 'Raportul nu a putut fi generat.')
     } finally {
       setSeGenereaza(false)
-    }
-  }
-
-  const sterge = (raport: RaportSoc) => {
-    if (!window.confirm(`Ștergeți raportul generat la ${formateazaDataOra(raport.generated_at)}?`)) {
-      return
-    }
-    setRapoarte(stergeRaport(raport.generated_at))
-    if (selectat?.generated_at === raport.generated_at) {
-      setSelectat(null)
     }
   }
 
@@ -89,12 +90,21 @@ export function PaginaRapoarte({ soc }: { soc: DateSoc }) {
             type="button"
             className="buton-actiune"
             onClick={genereaza}
-            disabled={!soc.conectat || seGenereaza}
+            disabled={!soc.conectat || seGenereaza || intervalInvalid}
           >
             {seGenereaza ? 'Se generează...' : 'Generează raport'}
           </button>
         }
       >
+        <fieldset className="raport-filtre" disabled={seGenereaza}>
+          <legend>Configurează documentul</legend>
+          <label>De la data<input type="date" value={deLa} max={panaLa || undefined} onChange={e => setDeLa(e.target.value)} required /></label>
+          <label>Până la data<input type="date" value={panaLa} min={deLa || undefined} onChange={e => setPanaLa(e.target.value)} required /></label>
+          <label>Conținutul raportului<select value={continut} onChange={e => setContinut(e.target.value as typeof continut)}>
+            <option value="toate">Toate datele</option><option value="incidente">Doar incidente</option><option value="dispozitive">Doar dispozitive</option>
+          </select></label>
+          {deLa && panaLa && deLa > panaLa && <p role="alert">Data de început trebuie să fie înaintea datei de sfârșit sau egală cu aceasta.</p>}
+        </fieldset>
         {eroare && (
           <p className="raport__eroare" role="alert">
             {eroare}
@@ -120,67 +130,7 @@ export function PaginaRapoarte({ soc }: { soc: DateSoc }) {
             <RaportGenerat raport={selectat} />
           </>
         ) : (
-          <StareGoala mesaj="Generați un raport din datele curente ale SOC sau deschideți unul salvat." />
-        )}
-      </Card>
-
-      <Card titlu={`Rapoarte salvate (${rapoarte.length})`}>
-        {rapoarte.length === 0 ? (
-          <StareGoala mesaj="Niciun raport salvat. Rapoartele generate se păstrează în acest browser." />
-        ) : (
-          <table className="tabel tabel--compact">
-            <thead>
-              <tr>
-                <th>Generat la</th>
-                <th>Evenimente</th>
-                <th>Alerte</th>
-                <th>Incidente</th>
-                <th>Dispozitive la risc</th>
-                <th aria-label="Acțiuni" />
-              </tr>
-            </thead>
-            <tbody>
-              {rapoarte.map((raport) => (
-                <tr key={raport.generated_at}>
-                  <td>
-                    {formateazaDataOra(raport.generated_at)}
-                    {raport.generated_at === selectat?.generated_at && (
-                      <span className="tabel__secundar"> · afișat</span>
-                    )}
-                  </td>
-                  <td className="tabel__numar">{formateazaNumarIntreg(raport.totals.events)}</td>
-                  <td className="tabel__numar">{formateazaNumarIntreg(raport.totals.alerts)}</td>
-                  <td className="tabel__numar">{formateazaNumarIntreg(raport.totals.incidents)}</td>
-                  <td className="tabel__numar">{formateazaNumarIntreg(raport.totals.devices_at_risk)}</td>
-                  <td>
-                    <div className="grup-butoane">
-                      <button
-                        type="button"
-                        className="buton-actiune buton-actiune--secundar"
-                        onClick={() => setSelectat(raport)}
-                      >
-                        Vezi
-                      </button>
-                      <button
-                        type="button"
-                        className="buton-actiune buton-actiune--secundar"
-                        onClick={() => descarcaPdfRaport(raport)}
-                      >
-                        PDF
-                      </button>
-                      <button
-                        type="button"
-                        className="buton-actiune buton-actiune--secundar"
-                        onClick={() => sterge(raport)}
-                      >
-                        Șterge
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <StareGoala mesaj="Selectați intervalul și conținutul, apoi generați raportul." />
         )}
       </Card>
 

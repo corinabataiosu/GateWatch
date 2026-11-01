@@ -14,8 +14,7 @@ import {
   StareGoala,
 } from '../comune/ElementeSoc'
 import { FluxCamera } from './FluxCamera'
-import { RestabilesteDispozitiv } from '../comune/RestabilesteDispozitiv'
-import { stareImagine } from '../../servicii/stareImagine'
+import { rezolvaAvertizareCamera } from '../../servicii/clientSoc'
 
 /** Singura cameră cu flux video în demonstrație. */
 const CAMERA_CU_FLUX = 'CAM-01'
@@ -23,6 +22,25 @@ const CAMERA_CU_FLUX = 'CAM-01'
 export function PaginaCamere({ soc }: { soc: DateSoc }) {
   const camere = soc.dispozitive.filter((dispozitiv) => dispozitiv.type === 'camera')
   const [fluxDeschis, setFluxDeschis] = useState(false)
+  const [inLucru, setInLucru] = useState<string | null>(null)
+  const [mesaj, setMesaj] = useState<string | null>(null)
+  const [eroare, setEroare] = useState<string | null>(null)
+
+  const rezolva = async (id: string) => {
+    if (inLucru) return
+    setInLucru(id)
+    setMesaj(null)
+    setEroare(null)
+    try {
+      const rezultat = await rezolvaAvertizareCamera(id)
+      setMesaj(`${id}: ${rezultat.closed_alerts} alerte fără incident închise. Dacă anomalia continuă, poate apărea o avertizare nouă.`)
+      soc.reimprospateaza()
+    } catch (e) {
+      setEroare(e instanceof Error ? e.message : 'Avertizarea nu a putut fi rezolvată.')
+    } finally {
+      setInLucru(null)
+    }
+  }
 
   return (
     <section className="pagina" aria-labelledby="titlu-camere">
@@ -33,6 +51,8 @@ export function PaginaCamere({ soc }: { soc: DateSoc }) {
         <MesajSocIndisponibil eroare={soc.eroare} />
       ) : (
         <Card titlu={`Camere (${camere.length})`}>
+          {mesaj && <p role="status">{mesaj}</p>}
+          {eroare && <p role="alert">{eroare}</p>}
           {camere.length === 0 ? (
             <StareGoala mesaj="SOC nu a raportat încă nicio cameră." />
           ) : (
@@ -48,7 +68,7 @@ export function PaginaCamere({ soc }: { soc: DateSoc }) {
                     <th scope="col">Stare imagine</th>
                     <th scope="col">Alerte deschise</th>
                     <th scope="col">Ultima activitate</th>
-                    <th scope="col">Administrare</th>
+                    <th scope="col">Acțiuni</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -74,7 +94,16 @@ export function PaginaCamere({ soc }: { soc: DateSoc }) {
                       <td>{stareImagine(camera.video)}</td>
                       <td>{camera.open_alerts}</td>
                       <td>{formateazaDataOra(camera.last_seen)}</td>
-                      <td><RestabilesteDispozitiv id={camera.device_id} onRestabilit={soc.reimprospateaza} /></td>
+                      <td>
+                        {(camera.standalone_alerts ?? 0) > 0 ? (
+                          <button type="button" className="buton-actiune buton-actiune--secundar"
+                            disabled={inLucru !== null || !soc.conectat}
+                            title="Închide alertele acestei camere care nu sunt asociate unui incident"
+                            onClick={(e) => { e.stopPropagation(); void rezolva(camera.device_id) }}>
+                            {inLucru === camera.device_id ? 'Se rezolvă...' : 'Rezolvă avertizarea'}
+                          </button>
+                        ) : camera.open_alerts > 0 ? <span className="tabel__secundar">Se gestionează din Incidente</span> : '—'}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

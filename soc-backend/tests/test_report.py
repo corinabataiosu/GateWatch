@@ -1,6 +1,32 @@
 """Generated report: summarizes the detected alerts and incidents."""
 
 
+def test_report_date_window_filters_events_alerts_and_devices(client, sim, factory):
+    sim.events = factory.compromised_vendor()
+    client.app_state.ingestion.poll_once()
+    params = {"start": "2026-10-31T00:00:00Z", "end": "2026-11-01T00:00:00Z"}
+    report = client.get('/api/report', params=params).json()
+    assert report['totals']['events'] == len(sim.events)
+    assert report['incidents'] and report['devices']
+    empty = client.get('/api/report', params={"start": "2026-11-01T00:00:00Z", "end": "2026-11-02T00:00:00Z"}).json()
+    assert empty['totals']['events'] == empty['totals']['alerts'] == 0
+    assert empty['incidents'] == empty['devices'] == empty['devices_at_risk'] == []
+    boundary = sim.events[0]['occurred_at']
+    before = client.get('/api/report', params={"end": boundary}).json()
+    assert before['totals']['events'] == 0  # upper bound is exclusive
+    inclusive = client.get('/api/report', params={"start": boundary}).json()
+    assert inclusive['totals']['events'] == len(sim.events)
+
+
+def test_report_rejects_invalid_interval(client):
+    for params in [
+        {'start': 'invalid'},
+        {'start': '2026-11-02T00:00:00Z', 'end': '2026-11-01T00:00:00Z'},
+        {'start': '2026-11-01T00:00:00'},
+    ]:
+        assert client.get('/api/report', params=params).status_code == 422
+
+
 def test_empty_report_says_nothing_detected(client):
     report = client.get("/api/report").json()
     assert report["totals"]["alerts"] == 0 and report["incidents"] == []

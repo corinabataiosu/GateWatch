@@ -36,9 +36,9 @@ STAFF_BADGES = [
 ]
 
 DOORS = {
-    "ACS-01": [("Terminal — intrare personal", False), ("Terminal — acces poartă îmbarcare", False)],
-    "ACS-02": [("Platformă — poartă handling", False), ("Platformă — hangar", False)],
-    "ACS-03": [("Operațiuni — sală servere OPS-2", True), ("Operațiuni — dispecerat", False)],
+    "ACS-01": [("Terminal - intrare personal", False), ("Terminal - acces poartă îmbarcare", False)],
+    "ACS-02": [("Platformă - poartă handling", False), ("Platformă - hangar", False)],
+    "ACS-03": [("Operațiuni - sală servere OPS-2", True), ("Operațiuni - dispecerat", False)],
 }
 
 

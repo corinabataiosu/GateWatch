@@ -117,6 +117,10 @@ export function obtineIncidente(): Promise<IncidentSoc[]> {
   return cerere('/api/incidents')
 }
 
+export function rezolvaAvertizareCamera(id: string): Promise<{ closed_alerts: number }> {
+  return cerere(`/api/devices/${encodeURIComponent(id)}/resolve-warning`, { method: 'POST' })
+}
+
 export function obtineDetaliiIncident(id: string): Promise<DetaliiIncidentSoc> {
   return cerere(`/api/incidents/${encodeURIComponent(id)}`)
 }
@@ -142,8 +146,11 @@ export function izoleazaDispozitiv(
 }
 
 /** Generează raportul de activitate pe baza datelor curente ale SOC. */
-export function genereazaRaport(): Promise<RaportSoc> {
-  return cerere<RaportSoc>('/api/report')
+export function genereazaRaport(start?: string, end?: string): Promise<RaportSoc> {
+  const params = new URLSearchParams()
+  if (start) params.set('start', start)
+  if (end) params.set('end', end)
+  return cerere<RaportSoc>(`/api/report?${params}`)
 }
 
 export function reseteazaSoc(): Promise<unknown> {

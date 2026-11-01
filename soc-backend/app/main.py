@@ -3,6 +3,7 @@
 Run from soc-backend/:  python -m uvicorn app.main:app --port 8000
 """
 import logging
+from datetime import datetime
 import urllib.error
 import hmac
 from functools import wraps
@@ -108,7 +109,7 @@ def create_app(config: Settings = default_settings, client: Optional[SimulatorCl
 
     def device_rows() -> list[dict[str, Any]]:
         open_alerts = db.query(
-            "SELECT a.device_id, a.severity, i.tactics FROM alerts a "
+            "SELECT a.device_id, a.severity, a.incident_id, i.tactics FROM alerts a "
             "LEFT JOIN incidents i ON i.incident_id = a.incident_id WHERE a.status = 'open'")
         rows = []
         for device in ingestion.devices:
@@ -129,6 +130,7 @@ def create_app(config: Settings = default_settings, client: Optional[SimulatorCl
                 "device_id": device["device_id"], "type": device.get("type"), "zone": device.get("zone"),
                 "ip": device.get("ip"), "name": device.get("name"), "operational_status": operational,
                 "security_state": security, "open_alerts": len(mine), "last_seen": device.get("last_seen"),
+                "standalone_alerts": sum(a["incident_id"] is None for a in mine),
                 "ml": score.__dict__ if score else None,
                 "video": video.view(device["device_id"]),
             })
@@ -159,6 +161,18 @@ def create_app(config: Settings = default_settings, client: Optional[SimulatorCl
     def devices():
         return device_rows()
 
+    @app.post("/api/devices/{device_id}/resolve-warning")
+    def resolve_warning(device_id: str):
+        if not any(d["device_id"] == device_id for d in ingestion.devices):
+            raise HTTPException(404, "Dispozitivul nu există.")
+        with pipeline.lock:
+            closed = db.execute(
+                "UPDATE alerts SET status = 'closed', updated_at = ? "
+                "WHERE device_id = ? AND status = 'open' AND incident_id IS NULL",
+                (now_iso(), device_id),
+            ).rowcount
+        return {"device_id": device_id, "closed_alerts": closed}
+
     @app.get("/api/events")
     def events(device_id: Optional[str] = None, limit: int = Query(100, ge=1, le=1000)):
         if device_id:
@@ -179,9 +193,14 @@ def create_app(config: Settings = default_settings, client: Optional[SimulatorCl
         return [alert_view(a) for a in db.query(sql + " ORDER BY updated_at DESC LIMIT ?", params + [limit])]
 
     @app.get("/api/report")
-    def report(format: Literal["json", "html"] = "json"):
+    def report(format: Literal["json", "html"] = "json", start: datetime | None = None, end: datetime | None = None):
+        from .models import iso
+        if any(value and value.tzinfo is None for value in (start, end)):
+            raise HTTPException(422, "Intervalul trebuie să includă fusul orar.")
+        if start and end and start >= end:
+            raise HTTPException(422, "Data de început trebuie să fie înaintea datei de sfârșit.")
         rule_names = {r["rule_id"]: r["name"] for r in pipeline.rules.catalog()}
-        data = build_report(db, device_rows(), rule_names)
+        data = build_report(db, device_rows(), rule_names, iso(start) if start else None, iso(end) if end else None)
         if format == "json":
             return data
         stamp = data["generated_at"][:19].replace(":", "-").replace("T", "-")

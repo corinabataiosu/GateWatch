@@ -52,6 +52,39 @@ def test_single_odd_frame_does_not_alert(client):
         assert post(client, sample(anomaly)).json()["alert_id"] is None
 
 
+def test_resolve_standalone_warning_preserves_history_and_allows_new_detection(client):
+    cam01(client)
+    for _ in range(3):
+        post(client, sample(True))
+    assert cam01(client)["standalone_alerts"] == 1
+    response = client.post("/api/devices/CAM-01/resolve-warning")
+    assert response.status_code == 200 and response.json()["closed_alerts"] == 1
+    assert cam01(client)["security_state"] == "normal"
+    assert client.get("/api/alerts").json()[0]["status"] == "closed"
+    assert client.post("/api/devices/CAM-01/resolve-warning").json()["closed_alerts"] == 0
+    assert post(client, sample(True)).json()["alert_id"] is not None
+    assert cam01(client)["security_state"] == "warning"
+
+
+def test_resolve_warning_keeps_incident_alerts(client, sim, factory):
+    sim.events = [factory.make("CAM-01", "auth_login", "failure", user="admin", advance=2) for _ in range(6)]
+    client.app_state.ingestion.poll_once()
+    for _ in range(3):
+        post(client, sample(True))
+    before = client.get("/api/alerts").json()
+    assert any(a["incident_id"] for a in before)
+    standalone = sum(a["incident_id"] is None and a["status"] == "open" for a in before)
+    assert client.post("/api/devices/CAM-01/resolve-warning").json()["closed_alerts"] == standalone
+    after = client.get("/api/alerts").json()
+    assert {a["alert_id"]: a for a in after if a["incident_id"]} == {
+        a["alert_id"]: a for a in before if a["incident_id"]}
+    assert cam01(client)["security_state"] != "normal"
+
+
+def test_resolve_warning_unknown_device(client):
+    assert client.post("/api/devices/UNKNOWN/resolve-warning").status_code == 404
+
+
 def test_alert_closes_when_image_recovers(client):
     for _ in range(3):
         post(client, sample(True))

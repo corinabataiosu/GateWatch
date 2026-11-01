@@ -47,6 +47,7 @@ export type DispozitivSoc = {
   operational_status: StareOperationalaSoc
   security_state: StareSecuritateSoc
   open_alerts: number
+  standalone_alerts?: number
   last_seen: string | null
   /** Ultimul scor Isolation Forest calculat de SOC pe evenimentele dispozitivului. */
   ml: ScorMlSoc | null
@@ -150,6 +151,10 @@ export type DetaliiIncidentSoc = IncidentSoc & {
 
 /** Raportul de activitate generat de SOC (GET /api/report). */
 export type RaportSoc = {
+  filters?: { start: string | null; end: string | null }
+  continut?: 'toate' | 'incidente' | 'dispozitive'
+  interval_selectat?: { deLa: string; panaLa: string }
+  devices?: RaportSoc['devices_at_risk']
   generated_at: string
   period: { first_event: string | null; last_event: string | null }
   summary: string

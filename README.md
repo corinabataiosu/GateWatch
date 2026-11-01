@@ -26,15 +26,6 @@ cd soc-backend && python -m uvicorn app.main:app --port 8000      # terminal 2
 cd frontend && npm install && npm run dev                          # terminal 3 → http://localhost:5173
 ```
 
-1. In the **Control Panel** start *Pornește AUTO* (or LIVE and step through the 7 stages).
-2. In the dashboard, the incident appears under **Incidente** within seconds; CAM-01 turns compromised.
-3. Optionally attack live: `python attacker-demo/attack_cam01.py`.
-4. Optionally run the video module: `python ml/src/agent_video.py --scenariu obturare --dupa 15`.
-   The CAM-01 panel shows live brightness, sharpness and frame-difference metrics; once the lens is covered,
-   CAM-01 goes to *Avertizare* with a video alert. That alert joins a CAM-01 incident if one is open.
-5. Respond from the incident view: *Izolează dispozitiv* isolates the device in the simulator (its services
-   then return 403) and moves the incident to *contained*.
-
 If the SOC is not running, the dashboard falls back to its labelled demo mode.
 
 Service URLs default to `127.0.0.1`, not `localhost`. On Windows `localhost` resolves to IPv6 first and every request

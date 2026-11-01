@@ -6,6 +6,18 @@ from pathlib import Path
 from typing import Any, Iterable, Optional
 
 SCHEMA = """
+CREATE TABLE IF NOT EXISTS device_restorations (
+    request_id TEXT PRIMARY KEY,
+    device_id TEXT NOT NULL,
+    restored_at TEXT NOT NULL,
+    result TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS device_watermarks (
+    device_id TEXT NOT NULL,
+    run_id TEXT NOT NULL,
+    seq INTEGER NOT NULL,
+    PRIMARY KEY(device_id, run_id)
+);
 CREATE TABLE IF NOT EXISTS events (
     event_id TEXT PRIMARY KEY,
     run_id TEXT NOT NULL,

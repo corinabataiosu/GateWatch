@@ -287,6 +287,30 @@ class AntiForensicsRule(Rule):
 
 
 class RuleEngine:
+    def reset_device(self, device_id: str) -> None:
+        """Remove only this device's evidence, including shared scan/badge windows."""
+        for rule in self.rules:
+            for name in ("failures", "exports"):
+                window = getattr(rule, name, None)
+                if window:
+                    for key in list(window.items):
+                        if key[0] == device_id:
+                            del window.items[key]
+            if isinstance(rule, NetworkScanRule):
+                for key, entries in list(rule.contacts.items.items()):
+                    remaining = deque((ts, value) for ts, value in entries if value[0] != device_id)
+                    if remaining:
+                        rule.contacts.items[key] = remaining
+                    else:
+                        del rule.contacts.items[key]
+            if isinstance(rule, ImpossibleBadgeTravelRule):
+                rule.last_seen = {k: v for k, v in rule.last_seen.items() if v[1] != device_id}
+            window = getattr(rule, "window", None)  # observation rules: (run, device, src, dst)
+            if window:
+                for key in list(window.items):
+                    if key[1] == device_id:
+                        del window.items[key]
+
     def __init__(self) -> None:
         failures = Window(120)
         from .manual_rules import observation_rules

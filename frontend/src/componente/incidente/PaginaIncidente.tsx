@@ -1,3 +1,4 @@
+import { RestabilesteDispozitiv } from '../comune/RestabilesteDispozitiv'
 import { useEffect, useState } from 'react'
 import type { DateSoc } from '../../carlige/useDateSoc'
 import {
@@ -47,7 +48,7 @@ function ListaIncidente({
             <th scope="col">Stare</th>
             <th scope="col">Dispozitive</th>
             <th scope="col">Tactici</th>
-            <th scope="col">Alerte</th>
+            <th scope="col">Alerte deschise / total</th>
             <th scope="col">Actualizat</th>
           </tr>
         </thead>
@@ -76,7 +77,7 @@ function ListaIncidente({
               </td>
               <td>{incident.devices.join(', ') || '—'}</td>
               <td>{incident.tactics.join(', ') || '—'}</td>
-              <td>{incident.alert_count}</td>
+              <td>{incident.open_alert_count ?? incident.alert_count} / {incident.alert_count}</td>
               <td>{formateazaDataOra(incident.updated_at)}</td>
             </tr>
           ))}
@@ -178,6 +179,7 @@ function DetaliiIncident({
                 >
                   {izolat ? 'Izolat' : 'Izolează dispozitiv'}
                 </button>
+                <RestabilesteDispozitiv id={idDispozitiv} onRestabilit={onModificat} />
               </li>
             )
           })}
@@ -203,7 +205,7 @@ function DetaliiIncident({
                   <strong>{alerta.title}</strong>
                   <span className="tabel__secundar">
                     {alerta.source === 'ml' ? 'ML' : `Regulă ${alerta.rule_id}`} · {alerta.device_id}{' '}
-                    · {formateazaOra(alerta.created_at)}
+                    · {formateazaOra(alerta.created_at)} · {alerta.status === 'closed' ? 'Închisă' : 'Deschisă'}
                   </span>
                 </div>
                 <p className="lista-alerte__descriere">{alerta.description}</p>

@@ -33,7 +33,7 @@ class Pipeline:
         self.rules = RuleEngine()
         self.correlator = Correlator(db)
         self.stats = PipelineStats()
-        self.lock = threading.Lock()
+        self.lock = threading.RLock()
 
     def reset(self) -> None:
         with self.lock:
@@ -58,6 +58,11 @@ class Pipeline:
                     self.stats.duplicates += 1
                     continue
                 self.stats.stored += 1
+                cutoff = self.db.scalar(
+                    "SELECT seq FROM device_watermarks WHERE device_id = ? AND run_id = ?",
+                    (event.device_id, event.run_id))
+                if cutoff is not None and event.seq <= cutoff:
+                    continue  # Preserve history without detecting pre-restoration evidence again.
                 created.extend(self._detect(event))
         self.stats.alerts_created += len(created)
         return created

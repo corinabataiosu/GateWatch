@@ -65,6 +65,7 @@ export function PaginaCamere({ soc }: { soc: DateSoc }) {
                     <th scope="col">Adresă IP</th>
                     <th scope="col">Stare operațională</th>
                     <th scope="col">Stare securitate</th>
+                    <th scope="col">Stare imagine</th>
                     <th scope="col">Alerte deschise</th>
                     <th scope="col">Ultima activitate</th>
                     <th scope="col">Acțiuni</th>
@@ -90,6 +91,7 @@ export function PaginaCamere({ soc }: { soc: DateSoc }) {
                       <td>
                         <Insigna stare={stareSau(STARI_SECURITATE_SOC, camera.security_state)} />
                       </td>
+                      <td>{stareImagine(camera.video)}</td>
                       <td>{camera.open_alerts}</td>
                       <td>{formateazaDataOra(camera.last_seen)}</td>
                       <td>

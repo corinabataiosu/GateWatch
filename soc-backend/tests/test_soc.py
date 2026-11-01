@@ -122,20 +122,20 @@ def test_resolving_incident_closes_alerts_and_restores_state(client, sim, factor
     sim.events = factory.compromised_vendor()
     ingest(client)
     incident_id = client.get("/api/incidents").json()[0]["incident_id"]
-    assert client.patch(f"/api/incidents/{incident_id}", json={"status": "resolved"}).json()["status"] == "resolved"
+    assert client.patch(f"/api/incidents/{incident_id}", headers={"X-Admin-Token": "gatewatch-admin"}, json={"status": "resolved"}).json()["status"] == "resolved"
     assert client.get("/api/alerts?status=open").json() == []
     assert client.get("/api/overview").json()["incidents_open"] == 0
-    assert client.patch(f"/api/incidents/{incident_id}", json={"status": "bogus"}).status_code == 422
+    assert client.patch(f"/api/incidents/{incident_id}", headers={"X-Admin-Token": "gatewatch-admin"}, json={"status": "bogus"}).status_code == 422
 
 
 def test_isolate_action_calls_simulator_and_contains(client, sim, factory):
     sim.events = factory.compromised_vendor()
     ingest(client)
     incident_id = client.get("/api/incidents").json()[0]["incident_id"]
-    resp = client.post(f"/api/incidents/{incident_id}/actions", json={"action": "isolate_device", "device_id": "CAM-01"})
+    resp = client.post(f"/api/incidents/{incident_id}/actions", headers={"X-Admin-Token": "gatewatch-admin"}, json={"action": "isolate_device", "device_id": "CAM-01"})
     assert resp.status_code == 200 and sim.isolated == ["CAM-01"]
     assert resp.json()["incident"]["status"] == "contained"
-    assert client.post(f"/api/incidents/{incident_id}/actions",
+    assert client.post(f"/api/incidents/{incident_id}/actions", headers={"X-Admin-Token": "gatewatch-admin"},
                        json={"action": "isolate_device", "device_id": "CAM-07"}).status_code == 400
 
 

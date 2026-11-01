@@ -41,8 +41,11 @@ python scripts/check_demo.py --sim http://192.168.8.120:8001
 ```
 
 Close other webcam apps and enable Windows desktop camera access. Calibrate
-with representative normal lighting and movement (600 frames at 5 FPS, about
-two minutes). The calibration command refuses to overwrite an existing model.
+with representative normal lighting and movement (600 training frames plus 150
+separate validation frames at 5 FPS, about 150 seconds). Activation requires at
+most 5% anomalous validation frames and no streak of three anomalous frames.
+A failed capture or validation preserves the previous model; successful replacement
+keeps a timestamped backup. The webcam never falls back to the synthetic model.
 
 ```powershell
 ./scripts/start-demo.ps1 calibrate -CameraIndex 0
@@ -52,6 +55,32 @@ two minutes). The calibration command refuses to overwrite an existing model.
 Calibration must finish before starting the agent. Both use the same frame
 pacing. If index 0 is unavailable, try 1 in both commands. Models stay local
 and are excluded from git. Recalibrate if the scene or lighting changes.
+
+In the local development dashboard, Camere also offers **Calibrează pentru această
+scenă**. This starts capture only when clicked. It stops the agent owned by the
+dashboard; if you started the agent in a terminal, stop that agent yourself first.
+After calibration succeeds, use **Vezi fluxul** to resume monitoring.
+
+## Restore a device for the demonstration
+
+Stop the attack source first. Use **Restabilește dispozitivul** in Camere or in an
+incident's device list. The admin action releases simulator isolation, closes only
+that device's open alerts and clears its detection windows. Events, alerts and the
+action audit remain available. An incident is resolved only when it has no open
+alerts left; its table shows **open / total** counts. Other devices are unaffected.
+Fresh attacks or persistent video anomalies can raise new alerts immediately after
+the normal detection thresholds are met; restoration does not disable detection.
+
+Image state is separate from security state. A normal image does not close historical
+incident-linked alerts, and no fresh video means **unavailable**, not **normal**.
+Restoration is an administrator's remediation acknowledgement, not automatic repair
+of credentials or a guarantee that a real device is clean.
+
+Mutating SOC APIs require `X-Admin-Token`. Local development pre-fills the existing
+demo token; override with browser localStorage key `gatewatch-admin-token` or
+`VITE_ADMIN_TOKEN`. The local video helper uses `GATEWATCH_ADMIN_TOKEN`. Use the same
+token on all components. A production frontend needs an explicit configured token;
+this shared demo credential is not an individual-user login system.
 
 Open `http://127.0.0.1:8002/flux.mjpg`, then Camere / Vezi fluxul. CAM-01 video
 telemetry should report source=camera and stale=false. Covering the lens should

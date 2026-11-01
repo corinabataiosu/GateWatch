@@ -5,10 +5,14 @@ Run from soc-backend/:  python -m uvicorn app.main:app --port 8000
 import logging
 from datetime import datetime
 import urllib.error
+import hmac
+from functools import wraps
+from uuid import UUID
+from datetime import datetime
 from contextlib import asynccontextmanager
 from typing import Any, Literal, Optional
 
-from fastapi import FastAPI, Header, HTTPException, Query
+from fastapi import Depends, FastAPI, Header, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
@@ -24,6 +28,7 @@ from .pipeline import Pipeline
 from .report import build_report, render_html
 from .rules import SEVERITY_RANK
 from .video import VideoMonitor, VideoTelemetry
+from .restoration import RestorationService
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
 
@@ -35,6 +40,10 @@ class StatusChange(BaseModel):
 class ResponseAction(BaseModel):
     action: Literal["isolate_device", "release_device"]
     device_id: str
+
+
+class RestoreDevice(BaseModel):
+    request_id: UUID
 
 
 def alert_view(alert: dict[str, Any]) -> dict[str, Any]:
@@ -49,10 +58,13 @@ def alert_view(alert: dict[str, Any]) -> dict[str, Any]:
 
 def incident_view(db: Database, incident: dict[str, Any]) -> dict[str, Any]:
     count = db.scalar("SELECT COUNT(*) FROM alerts WHERE incident_id = ?", (incident["incident_id"],))
+    open_count = db.scalar("SELECT COUNT(*) FROM alerts WHERE incident_id = ? AND status = 'open'",
+                           (incident["incident_id"],))
     return {
         "incident_id": incident["incident_id"], "title": incident["title"], "status": incident["status"],
         "severity": incident["severity"], "created_at": incident["created_at"],
         "updated_at": incident["updated_at"], "devices": incident["devices"], "alert_count": int(count or 0),
+        "open_alert_count": int(open_count or 0),
         "tactics": incident["tactics"], "summary": incident["summary"], "entities": incident["entities"],
         "run_id": incident["run_id"],
     }
@@ -65,6 +77,18 @@ def create_app(config: Settings = default_settings, client: Optional[SimulatorCl
     ingestion = IngestionEngine(config, db, pipeline, client)
     correlator = Correlator(db)
     video = VideoMonitor()
+    restoration = RestorationService(db, pipeline, ingestion, video)
+
+    def require_admin(x_admin_token: Optional[str] = Header(default=None)):
+        if not hmac.compare_digest(x_admin_token or "", config.admin_token):
+            raise HTTPException(401, "Token admin lipsă sau invalid.")
+
+    def synchronized(function):
+        @wraps(function)
+        def locked(*args, **kwargs):
+            with pipeline.lock:
+                return function(*args, **kwargs)
+        return locked
 
     @asynccontextmanager
     async def lifespan(_: FastAPI):
@@ -201,7 +225,8 @@ def create_app(config: Settings = default_settings, client: Optional[SimulatorCl
         return {**incident_view(db, incident), "alerts": [alert_view(a) for a in alerts_],
                 "timeline": timeline, "actions": actions}
 
-    @app.patch("/api/incidents/{incident_id}")
+    @app.patch("/api/incidents/{incident_id}", dependencies=[Depends(require_admin)])
+    @synchronized
     def change_status(incident_id: str, body: StatusChange):
         get_incident(incident_id)
         correlator.set_status(incident_id, body.status)
@@ -209,7 +234,8 @@ def create_app(config: Settings = default_settings, client: Optional[SimulatorCl
                    "VALUES (?, ?, 'status_change', NULL, 'ok', ?)", (incident_id, now_iso(), body.status))
         return incident_view(db, get_incident(incident_id))
 
-    @app.post("/api/incidents/{incident_id}/actions")
+    @app.post("/api/incidents/{incident_id}/actions", dependencies=[Depends(require_admin)])
+    @synchronized
     def respond(incident_id: str, body: ResponseAction):
         incident = get_incident(incident_id)
         if body.device_id not in incident["devices"]:
@@ -228,12 +254,27 @@ def create_app(config: Settings = default_settings, client: Optional[SimulatorCl
             raise HTTPException(502, detail)
         return {"result": result, "detail": detail, "incident": incident_view(db, get_incident(incident_id))}
 
+    @app.post("/api/devices/{device_id}/restore", dependencies=[Depends(require_admin)])
+    def restore_device(device_id: str, body: RestoreDevice):
+        try:
+            return restoration.restore(device_id, str(body.request_id))
+        except (urllib.error.URLError, OSError, ValueError, KeyError) as exc:
+            raise HTTPException(502, f"Restabilirea nu a fost finalizată; verifică simulatorul: {exc}") from exc
+
     @app.post("/api/video/telemetry")
+    @synchronized
     def video_telemetry(body: VideoTelemetry, x_admin_token: Optional[str] = Header(default=None)):
         if x_admin_token != config.admin_token:
             raise HTTPException(401, "invalid or missing X-Admin-Token")
         if body.device_id not in {d["device_id"] for d in ingestion.devices} and ingestion.devices:
             raise HTTPException(404, f"unknown device {body.device_id}")
+        cutoff = db.scalar("SELECT MAX(restored_at) FROM device_restorations WHERE device_id = ?", (body.device_id,))
+        if cutoff and body.captured_at.timestamp() <= datetime.fromisoformat(cutoff.replace('Z', '+00:00')).timestamp():
+            return {"accepted": False, "reason": "pre_restoration_sample", "alert_id": None, "streak": 0}
+        previous = video.latest.get(body.device_id)
+        if previous and body.captured_at <= datetime.fromisoformat(previous['captured_at'].replace('Z', '+00:00')):
+            return {"accepted": False, "reason": "out_of_order_sample", "alert_id": None,
+                    "streak": video.anomaly_streak.get(body.device_id, 0)}
         draft, cleared = video.ingest(body)
         alert = None
         if draft:
@@ -247,7 +288,8 @@ def create_app(config: Settings = default_settings, client: Optional[SimulatorCl
         return {"accepted": True, "alert_id": alert["alert_id"] if alert else None,
                 "streak": video.anomaly_streak.get(body.device_id, 0)}
 
-    @app.post("/api/reset")
+    @app.post("/api/reset", dependencies=[Depends(require_admin)])
+    @synchronized
     def reset():
         pipeline.reset()
         video.reset()

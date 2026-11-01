@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react'
 import { Card } from '../comune/ElementeSoc'
+import { anteteAdmin } from '../../servicii/clientSoc'
+import { CalibrareCamera } from './CalibrareCamera'
 
 /** Fluxul MJPEG publicat de agentul video (ml/src/agent_video.py). */
 const ADRESA_FLUX = import.meta.env.VITE_FLUX_CAM01_URL ?? 'http://127.0.0.1:8002/flux.mjpg'
@@ -13,6 +15,7 @@ type ProprietatiFluxCamera = {
 /** Afișează fluxul video live al camerei, la cerere. */
 export function FluxCamera({ identificator, deschis, onSchimba }: ProprietatiFluxCamera) {
   const [indisponibil, setIndisponibil] = useState(false)
+  const [eroarePornire, setEroarePornire] = useState('')
   // Cheia nouă la fiecare deschidere forțează reconectarea la flux.
   const [incercare, setIncercare] = useState(0)
 
@@ -22,13 +25,19 @@ export function FluxCamera({ identificator, deschis, onSchimba }: ProprietatiFlu
   const deschide = async () => {
     pornireIncercata.current = true
     setIndisponibil(false)
+    setEroarePornire('')
     if (import.meta.env.DEV) {
       // Serverul de dezvoltare pornește agentul video pe webcam dacă nu rulează deja.
       setSePorneste(true)
       try {
-        await fetch('/__agent-video/porneste', { method: 'POST' })
-      } catch {
-        // Dacă pornirea eșuează, imaginea de mai jos afișează starea „indisponibil”.
+        const response = await fetch('/__agent-video/porneste', { method: 'POST', headers: anteteAdmin() })
+        const body = await response.json() as { detail?: string }
+        if (!response.ok) throw new Error(body.detail || 'Pornirea camerei a eșuat.')
+      } catch (error) {
+        setEroarePornire(error instanceof Error ? error.message : 'Pornirea camerei a eșuat.')
+        setIndisponibil(true)
+        onSchimba(true)
+        return
       } finally {
         setSePorneste(false)
       }
@@ -58,7 +67,7 @@ export function FluxCamera({ identificator, deschis, onSchimba }: ProprietatiFlu
         </p>
       ) : indisponibil ? (
         <div className="flux-camera__indisponibil" role="status">
-          <p>Fluxul video nu este disponibil.</p>
+          <p>{eroarePornire || 'Fluxul video nu este disponibil.'}</p>
           <p className="flux-camera__nota">
             Verifică dacă webcam-ul nu e folosit de altă aplicație, apoi reîncearcă.
           </p>
@@ -85,6 +94,7 @@ export function FluxCamera({ identificator, deschis, onSchimba }: ProprietatiFlu
           <span className="flux-camera__live">LIVE</span>
         </div>
       )}
+      {import.meta.env.DEV && <CalibrareCamera onPornire={() => onSchimba(false)} />}
     </Card>
   )
 }

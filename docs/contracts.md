@@ -100,6 +100,24 @@ Attacker internal IP after VPN: `10.20.0.250`.
 - `GET  /api/report` → activity report built from current SOC data: `{generated_at, period, summary, totals, severity_counts, incidents_by_status, alerts_by_rule, techniques, incidents: [{…, alerts, actions}], devices_at_risk}`; `?format=html` returns the same report as a printable HTML download
 - `POST /api/reset` → clear SOC state (alerts/incidents/events); ingestion follows simulator's current run
 
+All mutating SOC endpoints require `X-Admin-Token`.
+
+`POST /api/devices/{device_id}/restore`, body `{request_id: UUID}`, returns
+`{device_id, closed_alerts, resolved_incidents, restored_at, result: "ok"}`.
+The request is idempotent: repeat the same UUID after a timeout; using it for a
+different device returns 409. Unknown devices return 404, offline devices 409,
+and simulator communication failures 502 without closing alerts. The service
+releases isolation if needed, closes only this device's open alerts, records the
+admin action and resets its rule/ML/video windows. Incidents resolve only if no
+open alerts remain. Source run/sequence watermarks retain pre-restoration backlog
+as historical events without detecting it again. Watermarks and restoration audit
+survive SOC reset/restart. Video captured before restoration is ignored. New
+evidence is still detected. Run one SOC worker; this is not a distributed transaction
+with the simulator (a successful release cannot be rolled back if a later DB write fails).
+
+Incident responses add `open_alert_count`; `alert_count` remains the historical total.
+Reopening an incident does not reopen its previously closed alerts.
+
 ## 6. Video telemetry (video module → SOC)
 
 The video module (`ml/src/agent_video.py`) is a second source for the same logical camera: the simulator
@@ -120,7 +138,22 @@ reports what the camera *does*, the video module what it *sees*. It posts one sa
 | `model_version` | string | artifact version |
 | `source` | `camera` \| `synthetic` | |
 
-SOC behaviour: 3 consecutive anomalous samples → alert `GW-V01` (source `ml`, severity `medium`, device state
+SOC behaviour: 3 consecutive samples with quality evidence → alert `GW-V01` (source `ml`, severity `medium`, device state
 `warning`). It never opens an incident on its own; it joins an active incident that already involves the
-device. Five consecutive normal samples close an unlinked `GW-V01` alert. `/api/devices[].video` exposes the
-latest sample plus `stale` (no sample for 10 s) and `diagnosis`.
+device. Five consecutive samples without quality evidence close an unlinked `GW-V01` alert. `/api/devices[].video` exposes the
+latest sample plus `stale` (no sample for 10 s), `diagnosis` and `image_state`
+(`normal`, `atypical_sample`, `persistent_anomaly`, `unavailable`). A telemetry gap
+over 10 s resets consecutive-sample counters. Security state still comes from open
+alerts, independently of the current image.
+
+Statistical novelty (`is_anomaly`) is advisory and remains visible. Quality evidence is
+near-black brightness (<25), saturation (>230), or an ML anomaly accompanied by
+sharpness below 25% of the calibrated normal reference. `reference_sharpness` is an
+optional positive telemetry field, derived from the median training sharpness by
+new calibrations. Without it, relative sharpness loss is not evaluated. Increased
+sharpness, motion, or identical frames alone do not prove degradation/replay.
+Responses expose `quality_issue` and `quality_reasons`. Thresholds are explicit in
+`app/video_policy.py`; they require commissioning against the intended scene.
+Naive timestamps and nonfinite metrics are rejected. Duplicate/out-of-order samples
+are ignored; changing model or source resets consecutive evidence. Deploy one agent
+per device at the contracted one sample/second rate and one SOC worker.

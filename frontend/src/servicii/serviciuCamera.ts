@@ -134,9 +134,14 @@ export function construiesteCameraDinSoc(
 
   let descriere: string
   if (video) {
-    descriere = video.is_anomaly
-      ? `Modulul video a semnalat o imagine atipică: ${video.diagnosis ?? 'caracteristici vizuale neobișnuite'}.`
+    descriere = video.quality_issue
+      ? `Degradare a imaginii: ${video.diagnosis}. Alertarea necesită persistență.`
+      : video.is_anomaly
+      ? 'Abatere statistică ML, fără degradare confirmată. Nu reprezintă singură o alertă de securitate.'
       : 'Modulul video nu a semnalat anomalii în imagine.'
+    if (video.quality_issue === false && alerteDeschise.some(a => a.rule_id === REGULA_VIDEO)) {
+      descriere += ' Există o alertă anterioară; verifică recuperarea și istoricul incidentului.'
+    }
     if (alertaMl) {
       descriere += ` Evenimente: ${alertaMl.description}`
     }
@@ -162,7 +167,7 @@ export function construiesteCameraDinSoc(
     stareConexiune: conectata ? 'conectata' : 'deconectata',
     disponibilitateFluxVideo: !conectata || videoOprit
       ? 'intrerupt'
-      : video?.is_anomaly
+      : video?.quality_issue
         ? 'degradat'
         : 'disponibil',
     stareSecuritate: stareSecuritateDinSoc(dispozitiv),

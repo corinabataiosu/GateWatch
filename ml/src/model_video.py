@@ -106,6 +106,11 @@ class DetectorVideo:
         self.model = artefact["model"]
         self.prag = float(artefact["prag"])
         self.versiune = artefact["versiune"]
+        self.sursa = artefact.get("sursa")
+        self.fps = artefact.get("fps")
+        self.camera_index = artefact.get("camera_index")
+        self.reference_sharpness = artefact.get('reference_sharpness')
+        self.calibration_validated = artefact.get('validation', {}).get('accepted') is True
         self.domeniu_min = np.asarray(artefact["domeniu_min"])
         self.domeniu_max = np.asarray(artefact["domeniu_max"])
 

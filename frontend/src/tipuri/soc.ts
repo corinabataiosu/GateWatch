@@ -56,6 +56,10 @@ export type DispozitivSoc = {
 }
 
 export type TelemetrieVideoSoc = {
+  quality_issue?: boolean
+  quality_reasons?: string[]
+  reference_sharpness?: number | null
+  image_state?: 'normal' | 'atypical_sample' | 'persistent_anomaly' | 'unavailable'
   captured_at: string
   /** Luminozitate medie, 0-255. */
   brightness: number
@@ -126,6 +130,7 @@ export type IncidentSoc = {
   updated_at: string
   devices: string[]
   alert_count: number
+  open_alert_count?: number
   tactics: string[]
   summary: string
 }

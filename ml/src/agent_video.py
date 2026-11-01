@@ -21,6 +21,7 @@ import time
 import urllib.error
 import urllib.request
 from datetime import datetime, timezone
+from pathlib import Path
 
 from caracteristici_video import RezultatCaracteristici, calculeaza_caracteristici
 from flux_video import PublicatorCadre, porneste_server
@@ -68,14 +69,23 @@ def main():
     parser.add_argument("--dupa", type=float, default=0, help="secunde de imagine normala inainte de scenariu")
     parser.add_argument("--durata", type=float, default=0, help="secunde de rulare (0 = pana la Ctrl+C)")
     parser.add_argument("--fps", type=fps_valid, default=FPS_IMPLICIT)
-    parser.add_argument("--model", default=CALE_MODEL_IMPLICIT)
+    parser.add_argument("--model", default=None)
     parser.add_argument("--soc", default="http://127.0.0.1:8000")
     parser.add_argument("--token", default="gatewatch-admin")
     parser.add_argument("--port-flux", type=int, default=8002,
                         help="port pentru fluxul MJPEG (http://127.0.0.1:PORT/flux.mjpg); 0 = dezactivat")
     args = parser.parse_args()
 
-    detector = DetectorVideo(args.model)
+    model = args.model or (str(Path(__file__).resolve().parents[1] / 'models/video_camera.joblib')
+                           if args.sursa == 'camera' else CALE_MODEL_IMPLICIT)
+    detector = DetectorVideo(model)
+    if args.sursa == 'camera':
+        if detector.sursa != 'camera' or detector.fps != args.fps:
+            parser.error('Webcam-ul necesită un model calibrat pe cameră la același FPS. Rulează calibrare_camera.py.')
+        if detector.camera_index is not None and detector.camera_index != args.camera:
+            parser.error('Modelul este calibrat pentru alt index de cameră.')
+        if not detector.calibration_validated or detector.reference_sharpness is None:
+            parser.error('Modelul camerei nu are validare separată. Rulează calibrare_camera.py înainte de pornire.')
     sursa = SursaSintetica() if args.sursa == "sintetica" else SursaCamera(args.camera)
     eticheta_sursa = "synthetic" if args.sursa == "sintetica" else "camera"
     print(f"agent video {args.id_camera}: sursa {args.sursa}, model {detector.versiune}, prag {detector.prag:.3f}")
@@ -114,6 +124,7 @@ def main():
                 ultima_trimitere = time.monotonic()
                 telemetrie = construieste_telemetrie(args.id_camera, rezultat, evaluare, detector.prag,
                                                      detector.versiune, eticheta_sursa)
+                telemetrie['reference_sharpness'] = detector.reference_sharpness
                 stare = "ANOMALIE" if telemetrie["is_anomaly"] else "normal"
                 try:
                     raspuns = trimite(args.soc, args.token, telemetrie)

@@ -16,6 +16,14 @@ const ADRESA_BAZA = import.meta.env.VITE_SOC_API_URL ?? ''
 
 const TIMP_MAXIM_CERERE_MS = 5000
 
+/** Demo token only; deployments can configure their own token explicitly. */
+export function anteteAdmin(): Record<string, string> {
+  const token = localStorage.getItem('gatewatch-admin-token')
+    ?? import.meta.env.VITE_ADMIN_TOKEN
+    ?? (import.meta.env.DEV ? 'gatewatch-admin' : '')
+  return { 'X-Admin-Token': token }
+}
+
 /** Eroare apărută la comunicarea cu backend-ul SOC. */
 export class EroareSoc extends Error {
   readonly codStare: number | null
@@ -27,14 +35,15 @@ export class EroareSoc extends Error {
   }
 }
 
-async function cerere<T>(cale: string, optiuni: RequestInit = {}): Promise<T> {
+async function cerere<T>(cale: string, optiuni: RequestInit = {}, timeout = TIMP_MAXIM_CERERE_MS): Promise<T> {
   const controler = new AbortController()
-  const temporizator = setTimeout(() => controler.abort(), TIMP_MAXIM_CERERE_MS)
+  const temporizator = setTimeout(() => controler.abort(), timeout)
 
   try {
     const raspuns = await fetch(`${ADRESA_BAZA}${cale}`, {
       ...optiuni,
-      headers: { 'Content-Type': 'application/json', ...optiuni.headers },
+      headers: { 'Content-Type': 'application/json',
+        ...(optiuni.method && optiuni.method !== 'GET' ? anteteAdmin() : {}), ...optiuni.headers },
       signal: controler.signal,
     })
 
@@ -146,4 +155,10 @@ export function genereazaRaport(start?: string, end?: string): Promise<RaportSoc
 
 export function reseteazaSoc(): Promise<unknown> {
   return cerere('/api/reset', { method: 'POST' })
+}
+
+export function restabilesteDispozitiv(id: string, requestId: string): Promise<{closed_alerts: number}> {
+  return cerere(`/api/devices/${encodeURIComponent(id)}/restore`, {
+    method: 'POST', body: JSON.stringify({ request_id: requestId }),
+  }, 20000)
 }

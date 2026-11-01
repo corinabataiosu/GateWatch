@@ -72,7 +72,7 @@ def main() -> int:
         status, run = call(f"{args.sim}/sim/runs", "POST", {}, admin)
         if status != 200:
             raise SystemExit(f"FAIL  could not start a simulator run (HTTP {status}; check --token)")
-        call(f"{args.soc}/api/reset", "POST", {})
+        call(f"{args.soc}/api/reset", "POST", {}, admin)
         wait_for("SOC follows the new run",
                  lambda: call(f"{args.soc}/api/health")[1]["ingestion"]["run_id"] == run["run_id"], args.timeout)
         ok("fresh run", run["run_id"])
